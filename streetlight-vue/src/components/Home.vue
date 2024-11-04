@@ -1,19 +1,28 @@
 <template>
   <div class="common-layout">
     <el-container>
-      <el-header>校园照明管理系统</el-header>
+      <el-header>
+        <div style="font-size: 32px;top:6px;position: relative;">校园照明管理系统</div>
+      </el-header>
       <el-container>
         <el-aside width="200px">Aside</el-aside>
-        <el-main>Main</el-main>
+        <el-main>
+          <MapView></MapView>
+        </el-main>
       </el-container>
     </el-container>
   </div>
 </template>
 
 <script setup>
+import MapView from '@/views/MapView.vue';
+
 </script>
 
 <style scoped lang="scss">
+div{
+  color: aliceblue;
+}
 .common-layout{
   height: 100vh;
 }
@@ -24,12 +33,13 @@
     display: flex;
   }
 .el-header{
-  background-color: aqua;
+  background-color: rgb(34, 34, 34);
+ 
 }
 .el-aside{
-  background-color: blueviolet;
+  background-color: rgb(48,48,48);
 }
 .el-main{
-  background-color: brown;
+  background-color: rgb(62, 61, 61);
 }
 </style>

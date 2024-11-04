@@ -17,7 +17,7 @@ export const tileLayer = new TileLayer({
   source: new XYZ({
     url: 'http://t4.tianditu.com/DataServer?T=vec_w&tk=9aa49772a6d157afe863294b50b104a3&x={x}&y={y}&l={z}'
   }),
-  className:'blackbase'
+  className:'blacktile'
 });
 
 //天地图标注底图
@@ -26,7 +26,7 @@ export const markLayer = new TileLayer({
   source: new XYZ({
     url: 'http://t4.tianditu.com/DataServer?T=cva_w&tk=9aa49772a6d157afe863294b50b104a3&x={x}&y={y}&l={z}'
   }),
-  className:'blackbase'
+  className:'blackmark'
 });
 
 //OSM底图

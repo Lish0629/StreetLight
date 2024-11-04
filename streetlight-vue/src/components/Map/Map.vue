@@ -7,9 +7,7 @@ import "ol/ol.css";
 
 import Map from 'ol/Map.js';
 import View from 'ol/View.js'
-import TileLayer from 'ol/layer/Tile.js';
 import { fromLonLat } from 'ol/proj';
-import { OSM } from "ol/source"
 import { onMounted } from 'vue';
 
 import { markLayer,tileLayer,imgLayer } from "@/data/layers";
@@ -39,7 +37,11 @@ onMounted(initMap)
   height:100%;
   width:100%;
 }
-.blackbase {
-  filter:  grayscale(60%) invert(80%); /* 这里是你想要的样式效果 */
+.blacktile {
+  filter:  grayscale(40%) invert(80%) contrast(120%) brightness(1.5); /* 这里是你想要的样式效果 */
+  
+}
+.blackmark{
+  filter:  grayscale(40%) invert(80%) brightness(1.2);
 }
 </style>

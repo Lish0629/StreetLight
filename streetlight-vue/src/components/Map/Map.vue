@@ -39,12 +39,10 @@ const initMap=()=>{
 const toggleStyle = () => {
   showAll.value = !showAll.value; // 切换状态
     // 先移除现有的图层
-    if (lanternLayer) {
+  if (lanternLayer) {
     map.removeLayer(lanternLayer);
   }
-
   // 创建新的图层并添加
-
   lanternLayer = createLanternLayer(showAll.value); // 重新生成图层
   map.addLayer(lanternLayer); // 更新地图上的图层
 };

@@ -1,8 +1,10 @@
 import TileLayer from 'ol/layer/Tile.js';
 import ImageLayer from "ol/layer/Image.js";
-import { fromLonLat } from 'ol/proj';
-import { ImageWMS,OSM,XYZ } from "ol/source";
-
+import { ImageWMS,OSM,XYZ, } from "ol/source";
+import VectorLayer from 'ol/layer/Vector';
+import VectorSource from 'ol/source/Vector';
+import GeoJSON from 'ol/format/GeoJSON';
+import { Style, Fill, Stroke, Circle as CircleStyle } from 'ol/style';
 //天地图影像底图
 export const imgLayer = new TileLayer({
   title: '天地图影像底图',
@@ -34,3 +36,44 @@ export const osmLayer = new TileLayer({
   title:'OpenStreet',
   source: new OSM()
 });
+
+//路灯WMS图层
+export const geomap = new ImageLayer({
+  visible: true,
+  opacity: 0.5,
+  source: new ImageWMS({
+    url: 'http://localhost:8081/geoserver/streetlight/wms',
+    params: {'LAYERS': 'streetlight:lantern'},
+    ratio: 1,
+    serverType: 'geoserver',
+  })
+});
+
+//路灯矢量
+export const lantern = new VectorLayer({
+  visible: true,
+  source: new VectorSource({
+    format: new GeoJSON({
+      dataProjection: "EPSG:4490",  // 数据的原始坐标系为 EPSG:4490
+      featureProjection: "EPSG:3857",  // 转换为地图显示坐标系 EPSG:3857
+    }),
+    url: 'http://localhost:8081/geoserver/streetlight/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=streetlight:lantern&outputFormat=application/json',
+  }),
+  style: (feature) => {
+    const isTrue = feature.get('status'); // 假设 'status' 是属性名
+    return new Style({
+      image: new CircleStyle({
+        radius: 6,
+        fill: new Fill({
+          color: isTrue ? 'rgba(255, 255, 0, 0.4)' : 'rgba(255, 0, 0, 0.4)', // 'true' 为黄色，'false' 为红色
+        }),
+        stroke: new Stroke({
+          color: 'black', // 外围黑色边框
+          width: 1,
+        }),
+      }),
+    });
+  },
+});
+
+

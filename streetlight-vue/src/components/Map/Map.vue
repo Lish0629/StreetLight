@@ -1,5 +1,11 @@
 <template>
-  <div id="map"></div>
+  <div>
+    <!-- 切换按钮 -->
+    <button @click="toggleStyle" style="position: absolute; z-index: 10; top: 10px; left: 10px; padding: 10px; background-color: white; border-radius: 5px;">
+      {{ showAll ? '显示只包含 false 的要素' : '显示全部要素' }}
+    </button>
+    <div id="map"></div>
+  </div>
 </template>
 
 <script setup>
@@ -8,15 +14,17 @@ import axios from 'axios';
 import Map from 'ol/Map.js';
 import View from 'ol/View.js'
 import { fromLonLat } from 'ol/proj';
-import { onMounted } from 'vue';
-import { markLayer,tileLayer,imgLayer,lantern } from "@/data/layers";
-
-var map;
+import { onMounted,ref } from 'vue';
+//import { markLayer,tileLayer,imgLayer,lantern } from "@/data/layers";
+import { markLayer, tileLayer, imgLayer, createLanternLayer } from "@/data/layers";
+let map;
+let lanternLayer = null;
+const showAll = ref(true); // 初始状态为显示全部
 const initMap=()=>{
   console.log("ready");
   map=new Map({
     target:'map',
-    layers: [tileLayer,markLayer,lantern],
+    layers: [tileLayer,markLayer,createLanternLayer(true)],
     view:new View({
       center:fromLonLat([119.725,30.259]),
       zoom:16.5,
@@ -26,6 +34,21 @@ const initMap=()=>{
     
   });
 }
+
+// 切换样式
+const toggleStyle = () => {
+  showAll.value = !showAll.value; // 切换状态
+    // 先移除现有的图层
+    if (lanternLayer) {
+    map.removeLayer(lanternLayer);
+  }
+
+  // 创建新的图层并添加
+
+  lanternLayer = createLanternLayer(showAll.value); // 重新生成图层
+  map.addLayer(lanternLayer); // 更新地图上的图层
+};
+
 //Geojson测试函数
 const contest=async ()=>{
   const url ='http://localhost:8081/geoserver/streetlight/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=streetlight:lantern&outputFormat=application/json'

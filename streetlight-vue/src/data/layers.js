@@ -77,3 +77,47 @@ export const lantern = new VectorLayer({
 });
 
 
+// 创建图层样式函数
+const getStyleFunction = (showAll) => {
+  return (feature) => {
+    const isTrue = feature.get('status'); // 假设 'status' 是属性名
+    // 只有在 showAll 为 true 或者 status 为 false 时才显示
+    if (showAll || !isTrue) {
+      return new Style({
+        image: new CircleStyle({
+          radius: 6,
+          fill: new Fill({
+            color: isTrue ? 'rgba(255, 255, 0, 0.4)' : 'rgba(255, 0, 0, 0.4)', // 'true' 为黄色，'false' 为红色
+          }),
+          stroke: new Stroke({
+            color: 'black', // 外围黑色边框
+            width: 1,
+          }),
+        }),
+      });
+    }
+    return null; // 不显示 status 为 true 的要素
+  };
+};
+
+let lanternLayer = null; // 存储图层对象
+export const createLanternLayer = (showAll) => {
+  if (lanternLayer) {
+    lanternLayer.setStyle(getStyleFunction(showAll)); // 更新样式
+    return lanternLayer;
+  }
+
+  lanternLayer = new VectorLayer({
+    visible: true,
+    source: new VectorSource({
+      format: new GeoJSON({
+        dataProjection: "EPSG:4490",
+        featureProjection: "EPSG:3857",
+      }),
+      url: 'http://localhost:8081/geoserver/streetlight/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=streetlight:lantern&outputFormat=application/json',
+    }),
+    style: getStyleFunction(showAll), // 初始样式
+  });
+
+  return lanternLayer;
+};

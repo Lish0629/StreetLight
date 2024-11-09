@@ -54,7 +54,7 @@ export const geomap = new ImageLayer({
 // 创建图层样式函数
 export const getStyleFunction = (showAll) => {
   return (feature) => {
-    console.log(showAll.value)
+    //console.log(showAll.value)
     const isTrue = feature.get('status'); // 假设 'status' 是属性名
     // 只有在 showAll 为 true 或者 status 为 false 时才显示
     if (showAll.value || !isTrue) {

@@ -35,14 +35,11 @@ const initMap=()=>{
   });
 }
 
-// 切换样式
+// 切换lantern样式
 const toggleStyle = () => {
   showAll.value = !showAll.value; // 切换状态
-  // 先移除现有的图层
   console.log(showAll.value);
-  // 创建新的图层并添加
   lanternLayer.setStyle(getStyleFunction(showAll)); // 更新样式
-
 };
 
 //Geojson测试函数
@@ -52,7 +49,6 @@ const contest=async ()=>{
   const response = await axios.get(url);
   // 输出 JSON 数据到控制台
   console.log(response.data);
-  console.log(lantern);
 }
 onMounted(()=>{
   initMap();

@@ -16,15 +16,15 @@ import View from 'ol/View.js'
 import { fromLonLat } from 'ol/proj';
 import { onMounted,ref } from 'vue';
 //import { markLayer,tileLayer,imgLayer,lantern } from "@/data/layers";
-import { markLayer, tileLayer, imgLayer, createLanternLayer } from "@/data/layers";
+import { markLayer, tileLayer, imgLayer, getStyleFunction,lanternLayer } from "@/data/layers";
 let map;
-let lanternLayer = null;
+
 const showAll = ref(true); // 初始状态为显示全部
 const initMap=()=>{
   console.log("ready");
   map=new Map({
     target:'map',
-    layers: [tileLayer,markLayer,createLanternLayer(true)],
+    layers: [tileLayer,markLayer,lanternLayer],
     view:new View({
       center:fromLonLat([119.725,30.259]),
       zoom:16.5,
@@ -38,13 +38,11 @@ const initMap=()=>{
 // 切换样式
 const toggleStyle = () => {
   showAll.value = !showAll.value; // 切换状态
-    // 先移除现有的图层
-  if (lanternLayer) {
-    map.removeLayer(lanternLayer);
-  }
+  // 先移除现有的图层
+  console.log(showAll.value);
   // 创建新的图层并添加
-  lanternLayer = createLanternLayer(showAll.value); // 重新生成图层
-  map.addLayer(lanternLayer); // 更新地图上的图层
+  lanternLayer.setStyle(getStyleFunction(showAll)); // 更新样式
+
 };
 
 //Geojson测试函数

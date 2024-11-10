@@ -1,9 +1,5 @@
 <template>
   <div>
-    <!-- 切换按钮 -->
-    <!--<button @click="toggleStyle" style="position: absolute; z-index: 10; top: 10px; left: 10px; padding: 10px; background-color: white; border-radius: 5px;">
-      {{ showAll ? '显示只包含 false 的要素' : '显示全部要素' }}
-    </button>-->
     <div id="map"></div>
   </div>
 </template>
@@ -60,7 +56,7 @@ const contest=async ()=>{
 
 onMounted(()=>{
   initMap();
-  //contest();
+
 });
 
 watch(()=>props.options.showAll,()=>{

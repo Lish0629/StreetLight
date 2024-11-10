@@ -3,21 +3,20 @@
     <el-container>
       <el-header height="80px">
         <div style="font-size: 32px;top:16px;position: relative;">校园照明管理系统</div>
-        <!--<el-button @click="options.showAll=!options.showAll">{{ options.showAll }}</el-button>-->
       </el-header>
       <el-container>
         <el-aside width="250px">
           <el-menu>
             <el-sub-menu index="1">
               <template #title class="asidemenu">
-                <div class="menu-title" style="height: 72px;">照明设施管理</div>
+                <div class="menu-title" >照明设施管理</div>
               </template>
               <div style="height: 400px;width: 100%;">
-                  <EquipManager @switchSA="handleShowAll" :options="options"></EquipManager>
+                  <EquipManager @switchSA="handleShowAll"></EquipManager>
               </div>
             </el-sub-menu>
             <el-sub-menu index="2">
-              <template #title class="asidemenu">
+              <template #title>
                 <div class="menu-title">照明区域分析</div>
               </template>
             </el-sub-menu>
@@ -67,20 +66,12 @@ const handleShowAll=()=>{
     display: flex;
 }
 .el-menu{
-  
   border-right: 0px;
 }
 .el-menu-item{
-  
   height: 72px;
   font-size: 16px;
 }
-
-:v-deep .el-sub-menu__title:hover {
-	color: #940909;
-}
-
-
 
 .el-header{
   background-color: rgb(34, 34, 34);

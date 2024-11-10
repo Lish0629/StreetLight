@@ -3,6 +3,7 @@
     <el-container>
       <el-header height="80px">
         <div style="font-size: 32px;top:16px;position: relative;">校园照明管理系统</div>
+        <!--<el-button @click="options.showAll=!options.showAll">{{ options.showAll }}</el-button>-->
       </el-header>
       <el-container>
         <el-aside width="250px">
@@ -11,8 +12,8 @@
               <template #title class="asidemenu">
                 <div class="menu-title" style="height: 72px;">照明设施管理</div>
               </template>
-              <div style="height: 400px;background-color: aquamarine;width: 100%;">
-                  <EquipManager></EquipManager>
+              <div style="height: 400px;width: 100%;">
+                  <EquipManager @switchSA="handleShowAll" :options="options"></EquipManager>
               </div>
             </el-sub-menu>
             <el-sub-menu index="2">
@@ -29,7 +30,9 @@
           </el-menu>
         </el-aside>
         <el-main>
-          <MapView></MapView>
+          <div class="mapdiv">
+            <Map :options="options"></Map>
+          </div>
         </el-main>
       </el-container>
     </el-container>
@@ -37,14 +40,23 @@
 </template>
 
 <script setup>
-import MapView from '@/views/MapView.vue';
+
+import Map from './map/Map.vue';
 import EquipManager from './EquipManager.vue';
+import { ref } from 'vue';
+
+const options =ref({
+  showAll:true
+});
+
+
+const handleShowAll=()=>{
+  options.value.showAll=!options.value.showAll
+}
 </script>
 
 <style scoped lang="scss">
-div{
-  color: rgb(240, 248, 255);
-}
+
 .common-layout{
   height: 100vh;
 }
@@ -55,34 +67,21 @@ div{
     display: flex;
 }
 .el-menu{
-  background-color: rgb(57,57,57);
+  
   border-right: 0px;
 }
 .el-menu-item{
-  color: rgb(240, 248, 255);
+  
   height: 72px;
   font-size: 16px;
 }
-.el-menu-item.is-active{
-  color: rgb(240, 248, 255);
-  background-color: rgb(110, 110, 124)!important;
+
+:v-deep .el-sub-menu__title:hover {
+	color: #940909;
 }
-.el-menu-item:hover{
-  background-color: rgb(110, 110, 124);
-}
-/*.el-sub-menu{
-  color: rgb(240, 248, 255)!important;
-  height: 72px;
-  font-size: 16px;
-}
-.el-sub-menu.is-active{
-  color: rgb(240, 248, 255);
-  background-color: rgb(110, 110, 124)!important;
-}
-.el-sub-menu:hover{
-  background-color: rgb(110, 110, 124);
-}
-*/
+
+
+
 .el-header{
   background-color: rgb(34, 34, 34);
 }
@@ -91,5 +90,10 @@ div{
 }
 .el-main{
   background-color: rgb(62, 61, 61);
+}
+.mapdiv{
+  width: 100%;
+  height: 100%;
+  position: relative;
 }
 </style>

@@ -1,9 +1,9 @@
 <template>
   <div>
     <!-- 切换按钮 -->
-    <button @click="toggleStyle" style="position: absolute; z-index: 10; top: 10px; left: 10px; padding: 10px; background-color: white; border-radius: 5px;">
+    <!--<button @click="toggleStyle" style="position: absolute; z-index: 10; top: 10px; left: 10px; padding: 10px; background-color: white; border-radius: 5px;">
       {{ showAll ? '显示只包含 false 的要素' : '显示全部要素' }}
-    </button>
+    </button>-->
     <div id="map"></div>
   </div>
 </template>
@@ -14,12 +14,18 @@ import axios from 'axios';
 import Map from 'ol/Map.js';
 import View from 'ol/View.js'
 import { fromLonLat } from 'ol/proj';
-import { onMounted,ref } from 'vue';
-//import { markLayer,tileLayer,imgLayer,lantern } from "@/data/layers";
+import { onMounted,ref,watch } from 'vue';
 import { markLayer, tileLayer, imgLayer, getStyleFunction,lanternLayer } from "@/data/layers";
-let map;
 
-const showAll = ref(true); // 初始状态为显示全部
+let map;
+// 初始状态为显示全部
+const showAll = ref(true);
+const props = defineProps({
+  options:{
+    showAll:true
+  }
+})
+
 const initMap=()=>{
   console.log("ready");
   map=new Map({
@@ -49,11 +55,18 @@ const contest=async ()=>{
   const response = await axios.get(url);
   // 输出 JSON 数据到控制台
   console.log(response.data);
-}
+};
+
+
 onMounted(()=>{
   initMap();
   //contest();
-})
+});
+
+watch(()=>props.options.showAll,()=>{
+  console.log('switchmap');
+  toggleStyle();
+});
 </script>
 
 <style lang="scss">

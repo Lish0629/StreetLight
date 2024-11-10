@@ -80,7 +80,7 @@ export const lanternLayer = new VectorLayer({
   visible: true,
   source: new VectorSource({
     format: new GeoJSON({
-      dataProjection: "EPSG:4490",
+      dataProjection: "EPSG:4326",
       featureProjection: "EPSG:3857",
     }),
     url: 'http://localhost:8081/geoserver/streetlight/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=streetlight:lantern&outputFormat=application/json',

@@ -7,16 +7,23 @@
       <el-container>
         <el-aside width="250px">
           <el-menu>
-            <el-menu-item index="2">
-              <el-icon><icon-menu /></el-icon>
-              <span>照明设施管理</span>
-            </el-menu-item>
+            <el-sub-menu index="1">
+              <template #title class="asidemenu">
+                <div class="menu-title" style="height: 72px;">照明设施管理</div>
+              </template>
+              <div style="height: 400px;background-color: aquamarine;width: 100%;">
+                  <EquipManager></EquipManager>
+              </div>
+            </el-sub-menu>
+            <el-sub-menu index="2">
+              <template #title class="asidemenu">
+                <div class="menu-title">照明区域分析</div>
+              </template>
+            </el-sub-menu>
             <el-menu-item index="3">
-              <el-icon><document /></el-icon>
               <span>照明区域分析</span>
             </el-menu-item>
-            <el-menu-item index="4">
-              <el-icon><setting /></el-icon>
+            <el-menu-item index="4" >
               <span>照明系统设置</span>
             </el-menu-item>
           </el-menu>
@@ -31,7 +38,7 @@
 
 <script setup>
 import MapView from '@/views/MapView.vue';
-
+import EquipManager from './EquipManager.vue';
 </script>
 
 <style scoped lang="scss">
@@ -63,6 +70,19 @@ div{
 .el-menu-item:hover{
   background-color: rgb(110, 110, 124);
 }
+/*.el-sub-menu{
+  color: rgb(240, 248, 255)!important;
+  height: 72px;
+  font-size: 16px;
+}
+.el-sub-menu.is-active{
+  color: rgb(240, 248, 255);
+  background-color: rgb(110, 110, 124)!important;
+}
+.el-sub-menu:hover{
+  background-color: rgb(110, 110, 124);
+}
+*/
 .el-header{
   background-color: rgb(34, 34, 34);
 }

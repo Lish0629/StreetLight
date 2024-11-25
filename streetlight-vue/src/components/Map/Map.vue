@@ -1,6 +1,13 @@
 <template>
   <div>
-    <div id="map"></div>
+    <div id="map">
+      <button class="toggle-menu-btn" @click="toggleMenu" :class="{ 'menu-hidden': !menuVisible }">
+        {{ menuVisible ? '<<' : '>>' }}
+      </button>
+      <div class="lantern-menu-container" v-if="menuVisible">
+        <LanternMenu />
+      </div>
+    </div>
   </div>
 </template>
 
@@ -12,8 +19,10 @@ import View from 'ol/View.js'
 import { fromLonLat } from 'ol/proj';
 import { onMounted,ref,watch } from 'vue';
 import { markLayer, tileLayer, imgLayer, getStyleFunction,lanternLayer } from "@/data/layers";
+import LanternMenu from "./LanternMenu.vue";
 
 let map;
+const menuVisible = ref(true);
 // 初始状态为显示全部
 const showAll = ref(true);
 const props = defineProps({
@@ -44,6 +53,11 @@ const toggleStyle = () => {
   lanternLayer.setStyle(getStyleFunction(showAll)); // 更新样式
 };
 
+// 切换菜单显示状态
+const toggleMenu = () => {
+  menuVisible.value = !menuVisible.value;
+};
+
 //Geojson测试函数
 const contest=async ()=>{
   const url ='http://localhost:8081/geoserver/streetlight/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=streetlight:lantern&outputFormat=application/json'
@@ -56,13 +70,14 @@ const contest=async ()=>{
 
 onMounted(()=>{
   initMap();
-
 });
 
+//监听路灯显示事件
 watch(()=>props.options.showAll,()=>{
   console.log('switchmap');
   toggleStyle();
 });
+
 </script>
 
 <style lang="scss">
@@ -80,5 +95,42 @@ watch(()=>props.options.showAll,()=>{
 }
 .blackmark{
   filter:  grayscale(40%) invert(80%) brightness(1.2);
+}
+/* LanternMenu 容器样式 */
+.lantern-menu-container {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%; /* 填充地图高度 */
+  width: 300px; /* 固定宽度 */
+  z-index: 1000; /* 确保在地图之上 */
+  background-color: rgba(0, 0, 0, 0.8); /* 半透明背景 */
+  overflow: hidden; /* 防止内容溢出 */
+  pointer-events: auto; /* 确保可以点击 */
+}
+/* 切换按钮样式 */
+.toggle-menu-btn {
+  position: absolute;
+  top: 10px; /* 与顶部对齐 */
+  right: 310px; /* 初始与菜单宽度一致 */
+  width: 40px;
+  height: 40px;
+  z-index: 1001;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  border: none;
+  border-radius: 0px; /* 圆形按钮 */
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+/* 菜单隐藏时调整按钮位置 */
+.toggle-menu-btn.menu-hidden {
+  right: 10px; /* 菜单隐藏后靠近屏幕右侧 */
+}
+
+/* 鼠标悬浮时按钮样式 */
+.toggle-menu-btn:hover {
+  background-color: rgba(0, 0, 0, 0.9);
 }
 </style>

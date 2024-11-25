@@ -13,6 +13,7 @@ import { RouterLink, RouterView } from 'vue-router'
 <style scoped>
 body{
   margin:0px;
+  overflow: hidden;
 }
 .main{
   position: absolute;

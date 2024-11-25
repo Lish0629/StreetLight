@@ -18,10 +18,11 @@ import Map from 'ol/Map.js';
 import View from 'ol/View.js'
 import { fromLonLat } from 'ol/proj';
 import { onMounted,ref,watch } from 'vue';
-import { markLayer, tileLayer, imgLayer, getStyleFunction,lanternLayer } from "@/data/layers";
+import { markLayer, tileLayer, imgLayer, getStyleFunction,lanternLayer,bufferLayer } from "@/data/layers";
 import LanternMenu from "./LanternMenu.vue";
 
 let map;
+let layerlist=[tileLayer,markLayer,lanternLayer,bufferLayer];
 const menuVisible = ref(true);
 // 初始状态为显示全部
 const showAll = ref(true);
@@ -35,7 +36,7 @@ const initMap=()=>{
   console.log("ready");
   map=new Map({
     target:'map',
-    layers: [tileLayer,markLayer,lanternLayer],
+    layers: [tileLayer,markLayer,lanternLayer,bufferLayer],
     view:new View({
       center:fromLonLat([119.725,30.259]),
       zoom:16.5,
@@ -51,6 +52,27 @@ const toggleStyle = () => {
   showAll.value = !showAll.value; // 切换状态
   console.log(showAll.value);
   lanternLayer.setStyle(getStyleFunction(showAll)); // 更新样式
+};
+
+const toggleBuffer = () => {
+  const layers = map.getLayers().getArray(); // 获取地图图层数组
+  let hasBufferLayer = false;
+
+  // 遍历图层数组
+  layers.forEach((layer) => {
+    if (layer.get('title') === 'bufferlayer') { // 如果找到缓冲区图层
+      map.removeLayer(bufferLayer); // 移除图层
+      console.log("Buffer layer removed");
+      hasBufferLayer = true; // 标志变量设置为 true
+    }
+  });
+
+  // 如果未找到缓冲区图层，则添加
+  if (!hasBufferLayer) {
+    bufferLayer.set('title', 'bufferlayer'); // 设置图层的唯一标识
+    map.addLayer(bufferLayer); // 添加缓冲区图层
+    console.log("Buffer layer added");
+  }
 };
 
 // 切换菜单显示状态
@@ -78,6 +100,9 @@ watch(()=>props.options.showAll,()=>{
   toggleStyle();
 });
 
+watch(()=>props.options.showBuffer,()=>{
+  toggleBuffer();
+})
 </script>
 
 <style lang="scss">

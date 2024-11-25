@@ -19,6 +19,9 @@
               <template #title>
                 <div class="menu-title">照明区域分析</div>
               </template>
+              <div style="height: 400px;width: 100%;">
+                  <AreaAnaysis @switchSB="handleShowBuffer"></AreaAnaysis>
+              </div>
             </el-sub-menu>
             <el-menu-item index="3">
               <span>照明区域分析</span>
@@ -43,14 +46,19 @@
 import Map from './map/Map.vue';
 import EquipManager from './EquipManager.vue';
 import { ref } from 'vue';
+import AreaAnaysis from './AreaAnaysis.vue';
 
 const options =ref({
-  showAll:true
+  showAll:true,
+  showBuffer:false
 });
 
 
 const handleShowAll=()=>{
   options.value.showAll=!options.value.showAll
+}
+const handleShowBuffer=()=>{
+  options.value.showBuffer=!options.value.showBuffer
 }
 </script>
 
@@ -86,5 +94,6 @@ const handleShowAll=()=>{
   width: 100%;
   height: 100%;
   position: relative;
+  bottom: 10px;
 }
 </style>

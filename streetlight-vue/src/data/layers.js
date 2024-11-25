@@ -76,6 +76,7 @@ export const getStyleFunction = (showAll) => {
 
 //路灯矢量
 export const lanternLayer = new VectorLayer({
+  title:'lanternlayer',
   visible: true,
   source: new VectorSource({
     format: new GeoJSON({
@@ -85,4 +86,18 @@ export const lanternLayer = new VectorLayer({
     url: 'http://localhost:8081/geoserver/streetlight/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=streetlight:lantern&outputFormat=application/json',
   }),
   style: getStyleFunction({value:true}), // 初始样式
+});
+
+
+
+export const bufferLayer = new ImageLayer({
+  title:'bufferlayer',
+  visible: true,
+  opacity: 0.8,
+  source: new ImageWMS({
+    url: 'http://localhost:8081/geoserver/streetlight/wms',
+    params: {'LAYERS': 'streetlight:buffer_result'},
+    ratio: 1,
+    serverType: 'geoserver',
+  })
 });

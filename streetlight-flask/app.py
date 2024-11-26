@@ -33,7 +33,7 @@ def create_user():
 @app.route('/generate-lantern-buffer',methods=['POST'])
 def generate_lantern_buffer():
     data = request.json
-    distance = data.get('distance',1000)
+    lantern_dist = data.get('lantern_dist',1000)
 
     try:
         with db.session.begin():
@@ -43,8 +43,8 @@ def generate_lantern_buffer():
                 SELECT 1,ST_UNION(ST_BUFFER(ST_Transform(geom,3857), :distance))
                 FROM lantern
                 WHERE status=true
-            '''),{'distance':distance})
-        return jsonify({'message':'缓冲区生成成功','distance':distance}),201
+            '''),{'distance':lantern_dist})
+        return jsonify({'message':'缓冲区生成成功','distance':lantern_dist}),201
     except Exception as e:
         print(f"Error:{e}")
         return jsonify({'error':'缓冲区生成失败','details':str(e)}),500

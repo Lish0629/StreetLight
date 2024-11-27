@@ -3,7 +3,7 @@
     <div class="create-buffer">
       <div class="slider-container">
         <span>建筑照明范围</span>
-        <el-slider v-model="dist.bulid_dist" :step="5" :max="50" style="width: 50px;" />
+        <el-slider v-model="dist.build_dist" :step="5" :max="50" style="width: 50px;" />
       </div>
       <div class="slider-container">
         <span>路灯照明范围</span>
@@ -24,11 +24,12 @@ import { defineEmits,ref } from 'vue';
 const va0=ref(false);
 
 const dist = ref({
-  bulid_dist: 10,
+  build_dist: 10,
   lantern_dist: 10
 });
 
 const generateBuffer = async () => {
+  console.log(dist.value)
   try {
     const response = await axios.post('http://127.0.0.1:5000/generate-lantern-buffer', dist.value, {
       headers: {

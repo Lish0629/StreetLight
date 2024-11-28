@@ -7,7 +7,7 @@
       <div class="lantern-menu-container" v-if="menuVisible">
         <LanternMenu />
       </div>
-      <button @click="toggleDraw" class="draw-btn">{{ drawMode ? '停止绘制' : '开始绘制' }}</button>
+      <!--<button @click="toggleDraw" class="draw-btn">{{ drawMode ? '停止绘制' : '开始绘制' }}</button>-->
     </div>
   </div>
 </template>
@@ -17,10 +17,10 @@ import "ol/ol.css";
 import axios from 'axios';
 import Map from 'ol/Map.js';
 import View from 'ol/View.js'
+import LanternMenu from "./LanternMenu.vue";
 import { fromLonLat } from 'ol/proj';
 import { onMounted,ref,watch } from 'vue';
-import { markLayer, tileLayer, imgLayer, getStyleFunction,lanternLayer,bufferLayer,pathLayer} from "@/data/layers";
-import LanternMenu from "./LanternMenu.vue";
+import { markLayer, tileLayer, imgLayer, getStyleFunction,lanternLayer,bufferLayer,pathLayer,pointLayer,vectorPoint} from "@/data/layers";
 import { Draw } from 'ol/interaction';
 import { Vector as VectorSource } from 'ol/source';
 import { Vector as VectorLayer } from 'ol/layer';
@@ -30,19 +30,10 @@ import { Feature } from 'ol';
 import { Point } from 'ol/geom';
 let map;
 let drawInteraction;
-let vectorPoint = new VectorSource();  // 用于存储绘制的点
-let pointLayer = new VectorLayer({
-  source: vectorPoint,
-});
+
 import flagImage from '@/assets/flag.png';
 
-// 创建小旗样式
-const flagIconStyle = new Style({
-  image: new Icon({
-    src: flagImage,  
-    scale: 0.015 // 缩放图标的大小
-  })
-});
+
 const store=useStore();
 const points = ref({ point1: null, point2: null });
 //菜单显示状态
@@ -118,6 +109,13 @@ const contest=async ()=>{
   console.log(response.data);
 };
 
+// 创建小旗样式
+const flagIconStyle = new Style({
+  image: new Icon({
+    src: flagImage,  
+    scale: 0.015 // 缩放图标的大小
+  })
+});
 //绘制模式
 const toggleDraw = () => {
 
@@ -164,9 +162,6 @@ const toggleDraw = () => {
   drawMode.value = !drawMode.value;
 };
 
-onMounted(()=>{
-  initMap();
-});
 
 //监听路灯显示事件
 watch(()=>props.options.showAll,()=>{
@@ -180,6 +175,11 @@ watch(()=>props.options.showBuffer,()=>{
 watch(()=>props.options.showDraw,()=>{
   toggleDraw();
 })
+
+onMounted(()=>{
+  initMap();
+});
+
 </script>
 
 <style lang="scss">

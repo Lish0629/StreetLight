@@ -101,6 +101,7 @@ export const bufferLayer = new ImageLayer({
     serverType: 'geoserver',
   })
 });
+
 export const pathLayer = new ImageLayer({
   title:'pathlayer',
   visible: true,
@@ -113,4 +114,7 @@ export const pathLayer = new ImageLayer({
   })
 });
 
-
+export const vectorPoint = new VectorSource();  // 用于存储绘制的点
+export const pointLayer = new VectorLayer({
+  source: vectorPoint,
+});

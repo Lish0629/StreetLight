@@ -101,3 +101,14 @@ export const bufferLayer = new ImageLayer({
     serverType: 'geoserver',
   })
 });
+export const pathLayer = new ImageLayer({
+  title:'pathlayer',
+  visible: true,
+  opacity: 1,
+  source: new ImageWMS({
+    url: 'http://localhost:8081/geoserver/streetlight/wms',
+    params: {'LAYERS': 'streetlight:paths'},
+    ratio: 1,
+    serverType: 'geoserver',
+  })
+});

@@ -5,25 +5,37 @@
     </div>
     <div class="switch">
       <span>显示最短路径</span>
-      <el-button @click="updateShowDraw">生成</el-button> <!-- 将按钮单独放到下一行 -->
+      <el-button @click="generatePath">生成</el-button> <!-- 将按钮单独放到下一行 -->
     </div>
   </div>
 </template>
 
 <script setup>
 import axios from "axios";
-import { defineEmits,ref } from 'vue';
+import { defineEmits,ref,computed } from 'vue';
+import { useStore } from "vuex";
 const va0=ref(true);
 const va1=ref(true);
-const dist = ref({
-  build_dist: 10,
-  lantern_dist: 10
-});
-
-const generateBuffer = async () => {
-  console.log(dist.value)
+const coordinates=ref({});
+const store=useStore();
+const points=computed(()=>store.state.points);
+const test1=()=>{
+  console.log(points.value);
+}
+const generatePath = async () => {
+  if (!points.value.point1 || !points.value.point2) {
+    console.error('Points are not defined yet');
+    return;
+  }
+  
+  coordinates.value = {
+    lon1: points.value.point1[0],
+    lat1: points.value.point1[1],
+    lon2: points.value.point2[0],
+    lat2: points.value.point2[1]
+  };
   try {
-    const response = await axios.post('http://127.0.0.1:5000/generate-lantern-buffer', dist.value, {
+    const response = await axios.post('http://127.0.0.1:5000/generate-path', coordinates.value, {
       headers: {
         'Content-Type': 'application/json',
       },

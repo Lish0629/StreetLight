@@ -1,16 +1,31 @@
-import { createStore } from 'vuex'
+// store/index.js
+import { createStore } from 'vuex';
+import points from './modules/points';  // 引入默认导出的 points 模块
 
 export default createStore({
-  state: {
-    
+  state :() => ({
+    points: {
+      point1: {},
+      point2: {}
+    }
+  }),
+  
+  mutations :{
+    setPoint(state, { pointIndex, coordinates }) {
+      state.points[pointIndex] = coordinates;
+    }
   },
-  getters: {
+  
+  actions : {
+    updatePoint({ commit }, { pointIndex, coordinates }) {
+      commit('setPoint', { pointIndex, coordinates });
+    }
   },
-  mutations: {
-    
-  },
-  actions: {
-  },
-  modules: {
+  
+  getters : {
+    getPoints(state) {
+      return state.points;
+    }
   }
-})
+});
+

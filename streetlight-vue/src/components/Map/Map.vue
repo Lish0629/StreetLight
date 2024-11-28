@@ -19,12 +19,12 @@ import Map from 'ol/Map.js';
 import View from 'ol/View.js'
 import { fromLonLat } from 'ol/proj';
 import { onMounted,ref,watch } from 'vue';
-import { markLayer, tileLayer, imgLayer, getStyleFunction,lanternLayer,bufferLayer } from "@/data/layers";
+import { markLayer, tileLayer, imgLayer, getStyleFunction,lanternLayer,bufferLayer,pathLayer} from "@/data/layers";
 import LanternMenu from "./LanternMenu.vue";
 import { Draw } from 'ol/interaction';
 import { Vector as VectorSource } from 'ol/source';
 import { Vector as VectorLayer } from 'ol/layer';
-
+import { useStore } from "vuex";
 
 let map;
 let drawInteraction;
@@ -32,7 +32,7 @@ let vectorPoint = new VectorSource();  // 用于存储绘制的点
 let pointLayer = new VectorLayer({
   source: vectorPoint,
 });
-
+const store=useStore();
 const points = ref({ point1: null, point2: null });
 //菜单显示状态
 const menuVisible = ref(true);
@@ -53,7 +53,7 @@ const initMap=()=>{
   console.log("ready");
   map=new Map({
     target:'map',
-    layers: [tileLayer,markLayer,lanternLayer,bufferLayer,pointLayer],
+    layers: [tileLayer,markLayer,lanternLayer,bufferLayer,pointLayer,pathLayer],
     view:new View({
       center:fromLonLat([119.725,30.259]),
       zoom:16.5,
@@ -109,6 +109,7 @@ const contest=async ()=>{
 
 //绘制模式
 const toggleDraw = () => {
+
   if (drawMode.value) {
     // 停止绘制模式
     map.removeInteraction(drawInteraction);
@@ -132,9 +133,11 @@ const toggleDraw = () => {
       // 判断是第一个点还是第二个点
       if (!points.value.point1) {
         points.value.point1 = coordinates;  // 存储第一个点
+        store.dispatch('updatePoint',{pointIndex:'point1',coordinates});
         console.log('第一个点存储:', points.value.point1);
       } else if (!points.value.point2) {
         points.value.point2 = coordinates;  // 存储第二个点
+        store.dispatch('updatePoint',{pointIndex:'point2',coordinates});
         console.log('第二个点存储:', points.value.point2);
         drawMode.value = false; // 结束绘制模式
         console.log('两个点都已绘制:', points.value);

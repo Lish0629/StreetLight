@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 from sqlalchemy import text
 
-from models import db, User
+from models import db, Lantern
 from config import Config
 from flask_cors import CORS
 
@@ -12,22 +12,14 @@ app.config.from_object(Config)
 db.init_app(app)
 CORS(app)
 
-@app.route('/users', methods=['GET'])
+#路灯信息
+@app.route('/lantern', methods=['GET'])
 def get_users():
-    users = User.query.all()
-    return jsonify([user.to_dict() for user in users])
+    lanterns = Lantern.query.all()
+    return jsonify([lantern.to_dict() for lantern in lanterns])
 
-@app.route('/test',methods=['GET'])
-def test():
-    return "test"
 
-@app.route('/users', methods=['POST'])
-def create_user():
-    data = request.json
-    new_user = User(name=data['name'], email=data['email'])
-    db.session.add(new_user)
-    db.session.commit()
-    return jsonify(new_user.to_dict()), 201
+
 
 #生成缓冲区分析图层
 @app.route('/generate-lantern-buffer',methods=['POST'])
@@ -62,62 +54,61 @@ def generate_path():
     data = request.json
     print(data)
 
-
     lat1 = data.get('lat1', 3536711.1)
-    lat2 = data.get('lat2', 3537602.8)  # 修正：原来是 lat1
-    lon1 = data.get('lon1', 13327894.0)  # 修正：原来是 lat1
-    lon2 = data.get('lon2', 13327141.7,)  # 修正：原来是 lat1
+    lat2 = data.get('lat2', 3537602.8)
+    lon1 = data.get('lon1', 13327894.0)
+    lon2 = data.get('lon2', 13327141.7)
 
     try:
         with db.session.begin():
             db.session.execute(text('DELETE FROM paths'))
             result = db.session.execute(text('''
                 WITH 
-    start_node AS (
-        SELECT id AS closest_node,
-               the_geom AS start_geom
-        FROM roadnet_vertices_pgr
-        ORDER BY ST_Distance(
-            the_geom,  -- 不需要转换，直接使用 SRID 3857
-            ST_SetSRID(ST_MakePoint(:lon1, :lat1), 3857)  -- 起点坐标使用 SRID 3857
-        )
-        LIMIT 1
-    ),
-    end_node AS (
-        SELECT id AS closest_node,
-               the_geom AS end_geom
-        FROM roadnet_vertices_pgr
-        ORDER BY ST_Distance(
-            the_geom,  -- 不需要转换，直接使用 SRID 3857
-            ST_SetSRID(ST_MakePoint(:lon2, :lat2), 3857)  -- 终点坐标使用 SRID 3857
-        )
-        LIMIT 1
-    ),
-    dijkstra_path AS (
-        SELECT edge, cost
-        FROM pgr_dijkstra(
-            'SELECT id, source, target, cost, reverse_cost FROM roadnet',
-            (SELECT closest_node FROM start_node),
-            (SELECT closest_node FROM end_node),
-            false
-        )
-        WHERE edge != -1
-    ),
-    path_geom AS (
-        SELECT ST_Union(geom) AS pgeom,
-               SUM(cost) AS total_cost
-        FROM roadnet
-        WHERE id IN (SELECT edge FROM dijkstra_path)
-    )
-    INSERT INTO paths (start_point, end_point, start_node, end_node, path, total_cost)
-    SELECT 
-        (SELECT start_geom FROM start_node) AS start_point,
-        (SELECT end_geom FROM end_node) AS end_point,
-        (SELECT closest_node FROM start_node) AS start_node,
-        (SELECT closest_node FROM end_node) AS end_node,
-        path_geom.pgeom AS path,
-        path_geom.total_cost AS total_cost
-    FROM path_geom;
+            start_node AS (
+                SELECT id AS closest_node,
+                       the_geom AS start_geom
+                FROM roadnet_vertices_pgr
+                ORDER BY ST_Distance(
+                    the_geom,  -- 不需要转换，直接使用 SRID 3857
+                    ST_SetSRID(ST_MakePoint(:lon1, :lat1), 3857)  -- 起点坐标使用 SRID 3857
+                )
+                LIMIT 1
+            ),
+            end_node AS (
+                SELECT id AS closest_node,
+                       the_geom AS end_geom
+                FROM roadnet_vertices_pgr
+                ORDER BY ST_Distance(
+                    the_geom,  -- 不需要转换，直接使用 SRID 3857
+                    ST_SetSRID(ST_MakePoint(:lon2, :lat2), 3857)  -- 终点坐标使用 SRID 3857
+                )
+                LIMIT 1
+            ),
+            dijkstra_path AS (
+                SELECT edge, cost
+                FROM pgr_dijkstra(
+                    'SELECT id, source, target, cost, reverse_cost FROM roadnet',
+                    (SELECT closest_node FROM start_node),
+                    (SELECT closest_node FROM end_node),
+                    false
+                )
+                WHERE edge != -1
+            ),
+            path_geom AS (
+                SELECT ST_Union(geom) AS pgeom,
+                       SUM(cost) AS total_cost
+                FROM roadnet
+                WHERE id IN (SELECT edge FROM dijkstra_path)
+            )
+            INSERT INTO paths (start_point, end_point, start_node, end_node, path, total_cost)
+            SELECT 
+                (SELECT start_geom FROM start_node) AS start_point,
+                (SELECT end_geom FROM end_node) AS end_point,
+                (SELECT closest_node FROM start_node) AS start_node,
+                (SELECT closest_node FROM end_node) AS end_node,
+                path_geom.pgeom AS path,
+                path_geom.total_cost AS total_cost
+            FROM path_geom;
 
             '''), {'lon1': lon1, 'lat1': lat1, 'lat2': lat2, 'lon2': lon2})
 

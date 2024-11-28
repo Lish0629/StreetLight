@@ -2,7 +2,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
-class User(db.Model):
+class Lantern(db.Model):
     __tablename__ = 'lantern'
 
     id = db.Column(db.Integer, primary_key=True)

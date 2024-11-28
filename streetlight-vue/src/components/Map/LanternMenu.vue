@@ -1,8 +1,8 @@
 <template>
   <div class="lantern-menu">
     <el-table :data="tableData" style="width: 100%" height="100%" :header-cell-style="{ position: 'sticky', top: 0, zIndex: 1 }">
-      <el-table-column prop="id" label="ID" width="180"></el-table-column>
-      <el-table-column prop="status" label="Status" width="120"
+      <el-table-column prop="id" label="序号" width="120"></el-table-column>
+      <el-table-column prop="status" label="路灯状态" width="180"
         :filters="statusFilters"
         :filter-method="filterStatus"
         column-key="status"
@@ -25,7 +25,7 @@ const tableData = ref([]);
 
 const fetchData = async () => {
   try{
-    const response = await axios.get('http://localhost:5000/users');
+    const response = await axios.get('http://localhost:5000/lantern');
     tableData.value = response.data;
     console.log(tableData.value);
   } catch (error) {

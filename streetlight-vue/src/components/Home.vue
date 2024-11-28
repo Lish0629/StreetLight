@@ -103,4 +103,9 @@ const handleShowDraw=()=>{
   position: relative;
   bottom: 10px;
 }
+
+.menu-title{
+  font-size: 18px;
+}
+
 </style>

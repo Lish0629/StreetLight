@@ -7,6 +7,7 @@
       <div class="lantern-menu-container" v-if="menuVisible">
         <LanternMenu />
       </div>
+      <button @click="toggleDraw" class="draw-btn">{{ drawMode ? '停止绘制' : '开始绘制' }}</button>
     </div>
   </div>
 </template>
@@ -20,12 +21,28 @@ import { fromLonLat } from 'ol/proj';
 import { onMounted,ref,watch } from 'vue';
 import { markLayer, tileLayer, imgLayer, getStyleFunction,lanternLayer,bufferLayer } from "@/data/layers";
 import LanternMenu from "./LanternMenu.vue";
+import { Draw } from 'ol/interaction';
+import { Vector as VectorSource } from 'ol/source';
+import { Vector as VectorLayer } from 'ol/layer';
+
 
 let map;
-let layerlist=[tileLayer,markLayer,lanternLayer,bufferLayer];
+let drawInteraction;
+let vectorPoint = new VectorSource();  // 用于存储绘制的点
+let pointLayer = new VectorLayer({
+  source: vectorPoint,
+});
+
+const points = ref({ point1: null, point2: null });
+//菜单显示状态
 const menuVisible = ref(true);
-// 初始状态为显示全部
+
+//路灯显示状态
 const showAll = ref(true);
+
+//绘制模式
+const drawMode = ref(false);
+
 const props = defineProps({
   options:{
     showAll:true
@@ -36,7 +53,7 @@ const initMap=()=>{
   console.log("ready");
   map=new Map({
     target:'map',
-    layers: [tileLayer,markLayer,lanternLayer,bufferLayer],
+    layers: [tileLayer,markLayer,lanternLayer,bufferLayer,pointLayer],
     view:new View({
       center:fromLonLat([119.725,30.259]),
       zoom:16.5,
@@ -54,6 +71,7 @@ const toggleStyle = () => {
   lanternLayer.setStyle(getStyleFunction(showAll)); // 更新样式
 };
 
+//缓冲区显示
 const toggleBuffer = () => {
   const layers = map.getLayers().getArray(); // 获取地图图层数组
   let hasBufferLayer = false;
@@ -89,6 +107,44 @@ const contest=async ()=>{
   console.log(response.data);
 };
 
+//绘制模式
+const toggleDraw = () => {
+  if (drawMode.value) {
+    // 停止绘制模式
+    map.removeInteraction(drawInteraction);
+  } else {
+    // 在开始绘制之前清空之前绘制的点
+    vectorPoint.clear(); // 清空所有点
+    points.value = {};   // 清空存储的点数据
+
+    // 启用绘制点交互
+    drawInteraction = new Draw({
+      source: vectorPoint,
+      type: 'Point',
+    });
+    map.addInteraction(drawInteraction);
+
+    // 绘制结束后获取点的坐标
+    drawInteraction.on('drawend', (event) => {
+      const coordinates = event.feature.getGeometry().getCoordinates();
+      console.log('绘制的点坐标:', coordinates);
+
+      // 判断是第一个点还是第二个点
+      if (!points.value.point1) {
+        points.value.point1 = coordinates;  // 存储第一个点
+        console.log('第一个点存储:', points.value.point1);
+      } else if (!points.value.point2) {
+        points.value.point2 = coordinates;  // 存储第二个点
+        console.log('第二个点存储:', points.value.point2);
+        drawMode.value = false; // 结束绘制模式
+        console.log('两个点都已绘制:', points.value);
+        map.removeInteraction(drawInteraction); // 停止绘制
+      }
+    });
+  }
+  // 切换绘制模式
+  drawMode.value = !drawMode.value;
+};
 
 onMounted(()=>{
   initMap();
@@ -102,6 +158,9 @@ watch(()=>props.options.showAll,()=>{
 
 watch(()=>props.options.showBuffer,()=>{
   toggleBuffer();
+})
+watch(()=>props.options.showDraw,()=>{
+  toggleDraw();
 })
 </script>
 
@@ -157,5 +216,24 @@ watch(()=>props.options.showBuffer,()=>{
 /* 鼠标悬浮时按钮样式 */
 .toggle-menu-btn:hover {
   background-color: rgba(0, 0, 0, 0.9);
+}
+
+
+/* 绘制按钮样式 */
+.draw-btn {
+  position: absolute;
+  top: 60px;
+  left: 10px;
+  background-color: #007BFF;
+  color: white;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  z-index: 1001;
+  border-radius: 5px;
+}
+
+.draw-btn:hover {
+  background-color: #0056b3;
 }
 </style>

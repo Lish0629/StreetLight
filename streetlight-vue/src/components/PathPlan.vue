@@ -1,19 +1,11 @@
 <template>
-  <div class="equip-container">
-    <div class="create-buffer">
-      <div class="slider-container">
-        <span>建筑照明范围</span>
-        <el-slider v-model="dist.build_dist" :step="5" :max="50" style="width: 50px;" />
-      </div>
-      <div class="slider-container">
-        <span>路灯照明范围</span>
-        <el-slider v-model="dist.lantern_dist" :step="5" :max="50" style="width: 50px;" />
-      </div>
-      <el-button @click="generateBuffer">生成</el-button> <!-- 将按钮单独放到下一行 -->
+  <div class="path-ccontainer">
+    <div class="create-path">
+      <el-button @click="updateShowDraw">绘制起始点</el-button> <!-- 将按钮单独放到下一行 -->
     </div>
     <div class="switch">
-      <span>显示照明区域</span>
-      <el-switch v-model="va0" @change="updateShowBuffer" style="display: flex;width: 50px;"/>
+      <span>显示最短路径</span>
+      <el-button @click="updateShowDraw">生成</el-button> <!-- 将按钮单独放到下一行 -->
     </div>
   </div>
 </template>
@@ -22,7 +14,7 @@
 import axios from "axios";
 import { defineEmits,ref } from 'vue';
 const va0=ref(true);
-
+const va1=ref(true);
 const dist = ref({
   build_dist: 10,
   lantern_dist: 10
@@ -42,16 +34,17 @@ const generateBuffer = async () => {
   }
 };
 
-const emit = defineEmits(['switchSB']);
+const emit = defineEmits(['switchSC']);
 
-const updateShowBuffer = () => {
-  emit('switchSB');  // 触发事件更新父组件
+const updateShowDraw = () => {
+  va1.value=!va1.value;
+  emit('switchSC');  // 触发事件更新父组件
 }
 </script>
 
 <style scoped lang="scss">
 
-.equip-container {
+.path-ccontainer {
   height: 100%; /* 设置容器高度 */
   background-color: rgb(52, 52, 52);
   display: flex;
@@ -70,7 +63,7 @@ const updateShowBuffer = () => {
   gap: 25px; /* 元素间距 */
 }
 
-.create-buffer {
+.create-path {
   display: flex;
   flex-direction: column; /* 垂直方向布局 */
   align-items: center; /* 居中对齐 */
@@ -85,7 +78,7 @@ const updateShowBuffer = () => {
   gap: 25px; /* 元素间的水平间距 */
 }
 
-.create-buffer el-button {
+.create-path el-button {
   align-self: center; /* 确保按钮居中 */
 }
 </style>

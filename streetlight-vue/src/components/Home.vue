@@ -11,7 +11,7 @@
               <template #title class="asidemenu">
                 <div class="menu-title" >照明设施管理</div>
               </template>
-              <div style="height: 400px;width: 100%;">
+              <div style="height: 200px;width: 100%;">
                   <EquipManager @switchSA="handleShowAll"></EquipManager>
               </div>
             </el-sub-menu>
@@ -23,12 +23,14 @@
                   <AreaAnaysis @switchSB="handleShowBuffer"></AreaAnaysis>
               </div>
             </el-sub-menu>
-            <el-menu-item index="3">
-              <span>照明区域分析</span>
-            </el-menu-item>
-            <el-menu-item index="4" >
-              <span>照明系统设置</span>
-            </el-menu-item>
+            <el-sub-menu index="3">
+              <template #title>
+                <div class="menu-title">夜行路线规划</div>
+              </template>
+              <div style="height: 400px;width: 100%;">
+                  <PathPlan @switchSC="handleShowDraw"></PathPlan>
+              </div>
+            </el-sub-menu>
           </el-menu>
         </el-aside>
         <el-main>
@@ -44,13 +46,14 @@
 <script setup>
 
 import Map from './map/Map.vue';
-import EquipManager from './EquipManager.vue';
 import { ref } from 'vue';
+import EquipManager from './EquipManager.vue';
 import AreaAnaysis from './AreaAnaysis.vue';
-
+import PathPlan from './PathPlan.vue';
 const options =ref({
   showAll:true,
-  showBuffer:false
+  showBuffer:false,
+  showDraw:false
 });
 
 
@@ -59,6 +62,10 @@ const handleShowAll=()=>{
 }
 const handleShowBuffer=()=>{
   options.value.showBuffer=!options.value.showBuffer
+}
+const handleShowDraw=()=>{
+  console.log('ss')
+  options.value.showDraw=!options.value.showDraw
 }
 </script>
 

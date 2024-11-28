@@ -25,12 +25,23 @@ import { Draw } from 'ol/interaction';
 import { Vector as VectorSource } from 'ol/source';
 import { Vector as VectorLayer } from 'ol/layer';
 import { useStore } from "vuex";
-
+import { Style, Icon } from 'ol/style';
+import { Feature } from 'ol';
+import { Point } from 'ol/geom';
 let map;
 let drawInteraction;
 let vectorPoint = new VectorSource();  // 用于存储绘制的点
 let pointLayer = new VectorLayer({
   source: vectorPoint,
+});
+import flagImage from '@/assets/flag.png';
+
+// 创建小旗样式
+const flagIconStyle = new Style({
+  image: new Icon({
+    src: flagImage,  
+    scale: 0.015 // 缩放图标的大小
+  })
 });
 const store=useStore();
 const points = ref({ point1: null, point2: null });
@@ -117,19 +128,23 @@ const toggleDraw = () => {
     // 在开始绘制之前清空之前绘制的点
     vectorPoint.clear(); // 清空所有点
     points.value = {};   // 清空存储的点数据
-
     // 启用绘制点交互
     drawInteraction = new Draw({
       source: vectorPoint,
       type: 'Point',
+      style: flagIconStyle,
+      showTemporary: false
     });
     map.addInteraction(drawInteraction);
+    drawInteraction.on('drawstart', (event) => {
+      const sketch = event.feature;  // 获取临时草图图层
+      sketch.setStyle(flagIconStyle);
+    });
 
     // 绘制结束后获取点的坐标
     drawInteraction.on('drawend', (event) => {
       const coordinates = event.feature.getGeometry().getCoordinates();
       console.log('绘制的点坐标:', coordinates);
-
       // 判断是第一个点还是第二个点
       if (!points.value.point1) {
         points.value.point1 = coordinates;  // 存储第一个点

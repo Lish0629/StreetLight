@@ -2,7 +2,13 @@
   <div class="common-layout">
     <el-container>
       <el-header height="80px">
-        <div style="font-size: 32px;top:16px;position: relative;">校园照明管理系统</div>
+        <!--
+        <div style="font-size: 32px;top:16px;position: relative;">校园照明管理系统
+         
+        </div>-->
+        <div style="position: relative;">
+          <img src='@/assets/title.png' style="top:32px" height="84"/>
+        </div>
       </el-header>
       <el-container>
         <el-aside width="250px">
@@ -50,6 +56,7 @@ import { ref } from 'vue';
 import EquipManager from './EquipManager.vue';
 import AreaAnaysis from './AreaAnaysis.vue';
 import PathPlan from './PathPlan.vue';
+import titleImage from '@/assets/title.png';
 const options =ref({
   showAll:true,
   showBuffer:false,

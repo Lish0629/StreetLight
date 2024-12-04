@@ -6,6 +6,7 @@
     <div class="switch">
       <span>显示最短路径</span>
       <el-button @click="generatePath">生成</el-button> <!-- 将按钮单独放到下一行 -->
+      <el-button @click="test1">生成</el-button> <!-- 将按钮单独放到下一行 -->
     </div>
   </div>
 </template>
@@ -18,22 +19,19 @@ const va0=ref(true);
 const va1=ref(true);
 const coordinates=ref({});
 const store=useStore();
-const points=computed(()=>store.state.points);
+const points=computed(()=>store.state.pathpoints.points).value;
 const test1=()=>{
-  console.log(points.value);
+  console.log(points.point1);
 }
 const generatePath = async () => {
-  if (!points.value.point1 || !points.value.point2) {
-    console.error('Points are not defined yet');
-    return;
-  }
-  
+  //console.log(points.value);
   coordinates.value = {
     lon1: points.value.point1[0],
     lat1: points.value.point1[1],
     lon2: points.value.point2[0],
     lat2: points.value.point2[1]
   };
+  //console.log(coordinates.value);
   try {
     const response = await axios.post('http://127.0.0.1:5000/generate-path', coordinates.value, {
       headers: {

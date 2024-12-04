@@ -14,7 +14,6 @@
 
 <script setup>
 import "ol/ol.css";
-import axios from 'axios';
 import Map from 'ol/Map.js';
 import View from 'ol/View.js'
 import LanternMenu from "./LanternMenu.vue";
@@ -22,17 +21,14 @@ import { fromLonLat } from 'ol/proj';
 import { onMounted,ref,watch } from 'vue';
 import { markLayer, tileLayer, imgLayer, getStyleFunction,lanternLayer,bufferLayer,pathLayer,pointLayer,vectorPoint} from "@/data/layers";
 import { Draw } from 'ol/interaction';
-import { Vector as VectorSource } from 'ol/source';
-import { Vector as VectorLayer } from 'ol/layer';
 import { useStore } from "vuex";
 import { Style, Icon } from 'ol/style';
-import { Feature } from 'ol';
-import { Point } from 'ol/geom';
+
+
 let map;
 let drawInteraction;
 
 import flagImage from '@/assets/flag.png';
-
 
 const store=useStore();
 const points = ref({ point1: null, point2: null });
@@ -55,7 +51,7 @@ const initMap=()=>{
   console.log("ready");
   map=new Map({
     target:'map',
-    layers: [tileLayer,markLayer,lanternLayer,bufferLayer,pointLayer,pathLayer],
+    layers: [tileLayer,markLayer,lanternLayer,pointLayer],
     view:new View({
       center:fromLonLat([119.725,30.259]),
       zoom:16.5,
@@ -100,14 +96,7 @@ const toggleMenu = () => {
   menuVisible.value = !menuVisible.value;
 };
 
-//Geojson测试函数
-const contest=async ()=>{
-  const url ='http://localhost:8081/geoserver/streetlight/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=streetlight:lantern&outputFormat=application/json'
-  // 使用 axios 发送 GET 请求，并等待响应
-  const response = await axios.get(url);
-  // 输出 JSON 数据到控制台
-  console.log(response.data);
-};
+
 
 // 创建小旗样式
 const flagIconStyle = new Style({

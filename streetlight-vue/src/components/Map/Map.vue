@@ -35,15 +35,11 @@ const points = ref({ point1: null, point2: null });
 //菜单显示状态
 const menuVisible = ref(true);
 
-//路灯显示状态
-const showAll = ref(true);
-
 //绘制模式
 const drawMode = ref(false);
 
 const props = defineProps({
   options:{
-    showAll:true
   }
 })
 
@@ -58,7 +54,6 @@ const initMap=()=>{
       minZoom:15,
       maxZoom:18.5
     }),
-    
   });
 }
 
@@ -119,9 +114,6 @@ const toggleDraw = () => {
   // 切换绘制模式
   drawMode.value = !drawMode.value;
 };
-
-
-
 
 watch(()=>props.options.showDraw,()=>{
   toggleDraw();
@@ -187,24 +179,6 @@ onMounted(()=>{
   background-color: rgba(0, 0, 0, 0.9);
 }
 
-
-/* 绘制按钮样式 */
-.draw-btn {
-  position: absolute;
-  top: 60px;
-  left: 10px;
-  background-color: #007BFF;
-  color: white;
-  border: none;
-  padding: 10px;
-  cursor: pointer;
-  z-index: 1001;
-  border-radius: 5px;
-}
-
-.draw-btn:hover {
-  background-color: #0056b3;
-}
 
 
 </style>

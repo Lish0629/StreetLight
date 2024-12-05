@@ -19,30 +19,34 @@ import View from 'ol/View.js'
 import LanternMenu from "./LanternMenu.vue";
 import { fromLonLat } from 'ol/proj';
 import { onMounted,ref,watch } from 'vue';
-import { markLayer, tileLayer, imgLayer,lanternLayer,bufferLayer,pathLayer,pointLayer,vectorPoint} from "@/data/layers";
+import { markLayer, tileLayer,lanternLayer,bufferLayer,pathLayer,pointLayer,vectorPoint} from "@/data/layers";
 import { Draw } from 'ol/interaction';
 import { useStore } from "vuex";
 import { Style, Icon } from 'ol/style';
-
+import flagImage from '@/assets/flag.png';
 
 let map;
 let drawInteraction;
 
-import flagImage from '@/assets/flag.png';
-
+//引入Vuex状态管理
 const store=useStore();
+
+//存储绘制的起始点
 const points = ref({ point1: null, point2: null });
+
 //菜单显示状态
 const menuVisible = ref(true);
 
 //绘制模式
 const drawMode = ref(false);
 
+//定义Props
 const props = defineProps({
   options:{
   }
 })
 
+//初始化地图
 const initMap=()=>{
   console.log("ready");
   map=new Map({
@@ -62,13 +66,14 @@ const toggleMenu = () => {
   menuVisible.value = !menuVisible.value;
 };
 
-// 创建小旗样式
+// 小旗样式
 const flagIconStyle = new Style({
   image: new Icon({
     src: flagImage,  
     scale: 0.015 // 缩放图标的大小
   })
 });
+
 //绘制模式
 const toggleDraw = () => {
 
@@ -115,6 +120,7 @@ const toggleDraw = () => {
   drawMode.value = !drawMode.value;
 };
 
+//监听绘制模型
 watch(()=>props.options.showDraw,()=>{
   toggleDraw();
 })
@@ -135,9 +141,11 @@ onMounted(()=>{
   height:100%;
   width:100%;
 }
+/* 矢量底图暗黑样式 */
 .blacktile {
   filter:  grayscale(40%) invert(80%) contrast(120%) brightness(1.5); /* 矢量图层暗黑模式 */
 }
+/* 标注暗黑样式 */
 .blackmark{
   filter:  grayscale(40%) invert(80%) brightness(1.2);
 }
@@ -178,7 +186,5 @@ onMounted(()=>{
 .toggle-menu-btn:hover {
   background-color: rgba(0, 0, 0, 0.9);
 }
-
-
 
 </style>

@@ -5,6 +5,7 @@ import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
 import GeoJSON from 'ol/format/GeoJSON';
 import { Style, Fill, Stroke, Circle as CircleStyle } from 'ol/style';
+
 //天地图影像底图
 export const imgLayer = new TileLayer({
   title: '天地图影像底图',
@@ -49,9 +50,7 @@ export const geomap = new ImageLayer({
   })
 });
 
-
-
-// 创建图层样式函数
+// 创建故障灯样式逻辑
 export const getStyleFunction = (showAll) => {
   return (feature) => {
     const isTrue = feature.get('status'); // 假设 'status' 是属性名
@@ -74,7 +73,7 @@ export const getStyleFunction = (showAll) => {
   };
 };
 
-//路灯矢量
+//路灯矢量图层
 export const lanternLayer = new VectorLayer({
   title:'lanternlayer',
   visible: true,
@@ -89,7 +88,7 @@ export const lanternLayer = new VectorLayer({
 });
 
 
-
+//照明区域图层
 export const bufferLayer = new ImageLayer({
   title:'bufferlayer',
   visible: false,
@@ -102,6 +101,8 @@ export const bufferLayer = new ImageLayer({
   })
 });
 
+
+//最短路径图层
 export const pathLayer = new ImageLayer({
   title:'pathlayer',
   visible: false,
@@ -114,7 +115,10 @@ export const pathLayer = new ImageLayer({
   })
 });
 
-export const vectorPoint = new VectorSource();  // 用于存储绘制的点
+//绘制点资源
+export const vectorPoint = new VectorSource();
+
+//绘制点图层
 export const pointLayer = new VectorLayer({
   source: vectorPoint,
 });

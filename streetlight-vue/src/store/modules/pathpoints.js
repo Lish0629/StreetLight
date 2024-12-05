@@ -1,4 +1,3 @@
-// store/modules/points.js
 const state = () => ({
   points: {
     point1: {},

@@ -52,17 +52,13 @@ import { ref } from 'vue';
 import EquipManager from './EquipManager.vue';
 import AreaAnaysis from './AreaAnaysis.vue';
 import PathPlan from './PathPlan.vue';
-import titleImage from '@/assets/title.png';
+
 const options =ref({
-  showAll:true,
-  showBuffer:false,
   showDraw:false
 });
 
 
-const handleShowAll=()=>{
-  options.value.showAll=!options.value.showAll
-}
+//切换绘制模式
 const handleShowDraw=()=>{
   console.log('ss')
   options.value.showDraw=!options.value.showDraw
@@ -83,7 +79,6 @@ const handleShowDraw=()=>{
 .el-menu{
   border-right: 0px;
   --el-menu-item-height: 72px; /* 新值 */
-  
 }
 
 .el-header{

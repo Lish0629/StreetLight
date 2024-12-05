@@ -23,11 +23,20 @@ import axios from "axios";
 import { defineEmits,ref,computed } from 'vue';
 import { useStore } from "vuex";
 import { pathLayer} from "@/data/layers";
+
+//路径图层显示属性
 const showPath = ref(false);
-const va1=ref(true);
+
+//起始点经纬度坐标
 const coordinates=ref({});
+
+//Vuex存储
 const store=useStore();
+
+//获取Vuex存储的point值
 const points=computed(()=>store.state.pathpoints.points);
+
+//起点文本格式化
 const point1text = computed(() => {
   if (points.value.point1[0]) {
     const lon = points.value.point1[0]?.toFixed(3) || "0.000";
@@ -36,6 +45,8 @@ const point1text = computed(() => {
   }
   return "起点坐标";
 });
+
+//终点文本格式化
 const point2text = computed(() => {
   if (points.value.point2[0]) {
     const lon = points.value.point2[0]?.toFixed(3) || "0.000";
@@ -44,10 +55,13 @@ const point2text = computed(() => {
   }
   return "终点坐标";
 });
+
+//测试函数
 const test1=()=>{
   console.log(points.point1);
-  
 }
+
+//生产路径端口
 const generatePath = async () => {
   //console.log(points.value);
   coordinates.value = {
@@ -69,17 +83,17 @@ const generatePath = async () => {
   }
 };
 
+//定义emit
 const emit = defineEmits(['switchSC']);
+
+//路径图层显示控制
 const updateShowPath = () => {
   pathLayer.setVisible(showPath.value)
 }
 
 const updateShowDraw = () => {
-  va1.value=!va1.value;
   emit('switchSC');  // 触发事件更新父组件
 }
-
-
 
 </script>
 
@@ -94,8 +108,6 @@ const updateShowDraw = () => {
   justify-content: space-around; /* 均匀分布子元素 */
   gap: 20px; /* 元素之间间距 */
 }
-
-
 
 .switch {
   display: flex;

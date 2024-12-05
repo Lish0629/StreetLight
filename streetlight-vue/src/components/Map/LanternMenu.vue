@@ -27,14 +27,19 @@ import { ref,onMounted } from 'vue';
 import { ElTable, ElTableColumn } from 'element-plus';
 import axios from 'axios';
 
+//筛选菜单，提供选项
 const statusFilters = [
   { text: "正常", value: true },
   { text: "异常", value: false },
 ];
+
+//筛选选择器，实现逻辑
 const filterStatus = (value, row) => row.status === value;
 
+//列表数据
 const tableData = ref([]);
 
+//获取数据
 const fetchData = async () => {
   try{
     const response = await axios.get('http://localhost:5000/lantern');
@@ -59,7 +64,7 @@ const updateStatus = async (row) => {
 
 onMounted(() => {
   fetchData();
-  });
+});
 </script>
 
 <style scoped>

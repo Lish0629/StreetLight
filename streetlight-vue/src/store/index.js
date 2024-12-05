@@ -1,6 +1,7 @@
-// store/index.js
 import { createStore } from 'vuex';
-import pathpoints from './modules/pathpoints';  // 引入默认导出的 points 模块
+
+// 引入导出的 points 模块
+import pathpoints from './modules/pathpoints';
 
 export default createStore({
   modules: {

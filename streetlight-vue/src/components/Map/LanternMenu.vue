@@ -2,11 +2,22 @@
   <div class="lantern-menu">
     <el-table :data="tableData" style="width: 100%" height="100%" :header-cell-style="{ position: 'sticky', top: 0, zIndex: 1 }">
       <el-table-column prop="id" label="序号" width="120"></el-table-column>
-      <el-table-column prop="status" label="路灯状态" width="180"
+        <el-table-column label="路灯状态" width="180"
         :filters="statusFilters"
         :filter-method="filterStatus"
         column-key="status"
-      ></el-table-column>
+        >
+        <template #default="{ row }">
+          <el-select
+            v-model="row.status"
+            placeholder="请选择状态"
+            @change="updateStatus(row)"
+          >
+            <el-option label="正常" :value="true" />
+            <el-option label="异常" :value="false" />
+          </el-select>
+        </template>
+      </el-table-column>
     </el-table>
   </div>
 </template>
@@ -17,10 +28,11 @@ import { ElTable, ElTableColumn } from 'element-plus';
 import axios from 'axios';
 
 const statusFilters = [
-  { text: "Active", value: true },
-  { text: "Inactive", value: false },
+  { text: "正常", value: true },
+  { text: "异常", value: false },
 ];
 const filterStatus = (value, row) => row.status === value;
+
 const tableData = ref([]);
 
 const fetchData = async () => {
@@ -30,6 +42,18 @@ const fetchData = async () => {
     console.log(tableData.value);
   } catch (error) {
     console.log(error);
+  }
+};
+
+// 更新路灯状态
+const updateStatus = async (row) => {
+  try {
+    const response = await axios.put(`http://localhost:5000/lantern/${row.id}`, {
+      status: row.status,
+    });
+    console.log("状态更新成功:", response.data);
+  } catch (error) {
+    console.error("状态更新失败:", error);
   }
 };
 

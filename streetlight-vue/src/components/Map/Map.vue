@@ -19,7 +19,7 @@ import View from 'ol/View.js'
 import LanternMenu from "./LanternMenu.vue";
 import { fromLonLat } from 'ol/proj';
 import { onMounted,ref,watch } from 'vue';
-import { markLayer, tileLayer, imgLayer, getStyleFunction,lanternLayer,bufferLayer,pathLayer,pointLayer,vectorPoint} from "@/data/layers";
+import { markLayer, tileLayer, imgLayer,lanternLayer,bufferLayer,pathLayer,pointLayer,vectorPoint} from "@/data/layers";
 import { Draw } from 'ol/interaction';
 import { useStore } from "vuex";
 import { Style, Icon } from 'ol/style';
@@ -51,7 +51,7 @@ const initMap=()=>{
   console.log("ready");
   map=new Map({
     target:'map',
-    layers: [tileLayer,markLayer,lanternLayer,pointLayer],
+    layers: [tileLayer,markLayer,lanternLayer,pointLayer,bufferLayer,pathLayer],
     view:new View({
       center:fromLonLat([119.725,30.259]),
       zoom:16.5,
@@ -62,41 +62,10 @@ const initMap=()=>{
   });
 }
 
-// 切换lantern样式
-const toggleStyle = () => {
-  showAll.value = !showAll.value; // 切换状态
-  console.log(showAll.value);
-  lanternLayer.setStyle(getStyleFunction(showAll)); // 更新样式
-};
-
-//缓冲区显示
-const toggleBuffer = () => {
-  const layers = map.getLayers().getArray(); // 获取地图图层数组
-  let hasBufferLayer = false;
-
-  // 遍历图层数组
-  layers.forEach((layer) => {
-    if (layer.get('title') === 'bufferlayer') { // 如果找到缓冲区图层
-      map.removeLayer(bufferLayer); // 移除图层
-      console.log("Buffer layer removed");
-      hasBufferLayer = true; // 标志变量设置为 true
-    }
-  });
-
-  // 如果未找到缓冲区图层，则添加
-  if (!hasBufferLayer) {
-    bufferLayer.set('title', 'bufferlayer'); // 设置图层的唯一标识
-    map.addLayer(bufferLayer); // 添加缓冲区图层
-    console.log("Buffer layer added");
-  }
-};
-
 // 切换菜单显示状态
 const toggleMenu = () => {
   menuVisible.value = !menuVisible.value;
 };
-
-
 
 // 创建小旗样式
 const flagIconStyle = new Style({
@@ -152,15 +121,8 @@ const toggleDraw = () => {
 };
 
 
-//监听路灯显示事件
-watch(()=>props.options.showAll,()=>{
-  console.log('switchmap');
-  toggleStyle();
-});
 
-watch(()=>props.options.showBuffer,()=>{
-  toggleBuffer();
-})
+
 watch(()=>props.options.showDraw,()=>{
   toggleDraw();
 })
@@ -243,4 +205,6 @@ onMounted(()=>{
 .draw-btn:hover {
   background-color: #0056b3;
 }
+
+
 </style>

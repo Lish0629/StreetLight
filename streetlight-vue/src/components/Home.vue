@@ -2,10 +2,6 @@
   <div class="common-layout">
     <el-container>
       <el-header height="80px">
-        <!--
-        <div style="font-size: 32px;top:16px;position: relative;">校园照明管理系统
-         
-        </div>-->
         <div style="position: relative;">
           <img src='@/assets/title.png' style="top:32px" height="84"/>
         </div>
@@ -18,7 +14,7 @@
                 <div class="menu-title" >照明设施管理</div>
               </template>
               <div style="height: 200px;width: 100%;">
-                  <EquipManager @switchSA="handleShowAll"></EquipManager>
+                  <EquipManager></EquipManager>
               </div>
             </el-sub-menu>
             <el-sub-menu index="2">
@@ -26,7 +22,7 @@
                 <div class="menu-title">照明区域分析</div>
               </template>
               <div style="height: 400px;width: 100%;">
-                  <AreaAnaysis @switchSB="handleShowBuffer"></AreaAnaysis>
+                  <AreaAnaysis></AreaAnaysis>
               </div>
             </el-sub-menu>
             <el-sub-menu index="3">
@@ -67,16 +63,13 @@ const options =ref({
 const handleShowAll=()=>{
   options.value.showAll=!options.value.showAll
 }
-const handleShowBuffer=()=>{
-  options.value.showBuffer=!options.value.showBuffer
-}
 const handleShowDraw=()=>{
   console.log('ss')
   options.value.showDraw=!options.value.showDraw
 }
 </script>
 
-<style scoped lang="scss">
+<style  lang="scss">
 
 .common-layout{
   height: 100vh;
@@ -89,10 +82,8 @@ const handleShowDraw=()=>{
 }
 .el-menu{
   border-right: 0px;
-}
-.el-menu-item{
-  height: 72px;
-  font-size: 16px;
+  --el-menu-item-height: 72px; /* 新值 */
+  
 }
 
 .el-header{
@@ -100,6 +91,7 @@ const handleShowDraw=()=>{
 }
 .el-aside{
   background-color: rgb(48,48,48);
+  overflow: hidden !important;
 }
 .el-main{
   background-color: rgb(62, 61, 61);

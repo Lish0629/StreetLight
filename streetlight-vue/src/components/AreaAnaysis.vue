@@ -9,7 +9,7 @@
         <span>路灯照明范围</span>
         <el-slider v-model="dist.lantern_dist" :step="5" :max="50" style="width: 50px;" />
       </div>
-      <el-button @click="generateBuffer">生成</el-button> <!-- 将按钮单独放到下一行 -->
+      <el-button @click="generateBuffer">💡生成照明区域</el-button> <!-- 将按钮单独放到下一行 -->
     </div>
     <div class="switch">
       <span>显示照明区域</span>
@@ -21,7 +21,8 @@
 <script setup>
 import axios from "axios";
 import { defineEmits,ref } from 'vue';
-const va0=ref(true);
+import {bufferLayer} from "@/data/layers";
+const va0=ref(false);
 
 const dist = ref({
   build_dist: 10,
@@ -42,10 +43,9 @@ const generateBuffer = async () => {
   }
 };
 
-const emit = defineEmits(['switchSB']);
 
 const updateShowBuffer = () => {
-  emit('switchSB');  // 触发事件更新父组件
+  bufferLayer.setVisible(va0.value);
 }
 </script>
 

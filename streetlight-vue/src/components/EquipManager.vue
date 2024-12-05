@@ -1,6 +1,6 @@
 <template>
   <div class="equip-container">
-    <div class="SA">
+    <div class="switch">
         <span>仅显示故障路灯</span>
         <el-switch v-model="va" @change="updateShowAll" style="display: flex;"/>
     </div>
@@ -8,12 +8,12 @@
 </template>
 
 <script setup>
-import { defineEmits,ref } from 'vue';
+import { ref } from 'vue';
+import { lanternLayer,getStyleFunction } from '@/data/layers';
 const va=ref(false);
-const emit = defineEmits(['switchSA']);
 
 const updateShowAll = () => {
-  emit('switchSA');  // 触发事件更新父组件
+  lanternLayer.setStyle(getStyleFunction(!va.value)); // 更新样式
 }
 </script>
 
@@ -26,7 +26,7 @@ const updateShowAll = () => {
   flex-direction: column;  /* 垂直方向布局 */
 }
 
-.SA{
+.switch{
   display: flex;
   flex-direction: row;
   padding: 20px;  /* 内边距调整，避免紧贴边缘 */

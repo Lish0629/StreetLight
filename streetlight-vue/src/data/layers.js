@@ -56,7 +56,7 @@ export const getStyleFunction = (showAll) => {
   return (feature) => {
     const isTrue = feature.get('status'); // 假设 'status' 是属性名
     // 只有在 showAll 为 true 或者 status 为 false 时才显示
-    if (showAll.value || !isTrue) {
+    if (showAll || !isTrue) {
       return new Style({
         image: new CircleStyle({
           radius: 6,
@@ -92,7 +92,7 @@ export const lanternLayer = new VectorLayer({
 
 export const bufferLayer = new ImageLayer({
   title:'bufferlayer',
-  visible: true,
+  visible: false,
   opacity: 0.8,
   source: new ImageWMS({
     url: 'http://localhost:8081/geoserver/streetlight/wms',
@@ -104,7 +104,7 @@ export const bufferLayer = new ImageLayer({
 
 export const pathLayer = new ImageLayer({
   title:'pathlayer',
-  visible: true,
+  visible: false,
   opacity: 1,
   source: new ImageWMS({
     url: 'http://localhost:8081/geoserver/streetlight/wms',

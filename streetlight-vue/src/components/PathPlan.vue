@@ -1,12 +1,19 @@
 <template>
-  <div class="path-ccontainer">
+  <div class="path-container">
     <div class="create-path">
-      <el-button @click="updateShowDraw">绘制起始点</el-button> <!-- 将按钮单独放到下一行 -->
+      <el-button @click="updateShowDraw">🚩绘制起始点</el-button> 
+      <!-- 输入框，用于显示坐标 -->
+      <div class="coordinates" width="80%" align-items="center">
+        <span>起点:</span>
+        <el-input v-model="point1text" placeholder="起点坐标" readonly></el-input>
+        <span>终点:</span>
+        <el-input v-model="point2text" placeholder="终点坐标" readonly></el-input>
+      </div>
     </div>
+    <el-button @click="generatePath">🗺️生成最短路径</el-button> <!-- 将按钮单独放到下一行 -->
     <div class="switch">
       <span>显示最短路径</span>
-      <el-button @click="generatePath">生成</el-button> <!-- 将按钮单独放到下一行 -->
-      <el-button @click="test1">生成</el-button> <!-- 将按钮单独放到下一行 -->
+      <el-switch v-model="showPath" @change="updateShowPath" style="display: flex;"/>
     </div>
   </div>
 </template>
@@ -15,13 +22,31 @@
 import axios from "axios";
 import { defineEmits,ref,computed } from 'vue';
 import { useStore } from "vuex";
-const va0=ref(true);
+import { pathLayer} from "@/data/layers";
+const showPath = ref(false);
 const va1=ref(true);
 const coordinates=ref({});
 const store=useStore();
-const points=computed(()=>store.state.pathpoints.points).value;
+const points=computed(()=>store.state.pathpoints.points);
+const point1text = computed(() => {
+  if (points.value.point1[0]) {
+    const lon = points.value.point1[0]?.toFixed(3) || "0.000";
+    const lat = points.value.point1[1]?.toFixed(3) || "0.000";
+    return `${lon}, ${lat}`;
+  }
+  return "起点坐标";
+});
+const point2text = computed(() => {
+  if (points.value.point2[0]) {
+    const lon = points.value.point2[0]?.toFixed(3) || "0.000";
+    const lat = points.value.point2[1]?.toFixed(3) || "0.000";
+    return `${lon}, ${lat}`;
+  }
+  return "终点坐标";
+});
 const test1=()=>{
   console.log(points.point1);
+  
 }
 const generatePath = async () => {
   //console.log(points.value);
@@ -31,7 +56,7 @@ const generatePath = async () => {
     lon2: points.value.point2[0],
     lat2: points.value.point2[1]
   };
-  //console.log(coordinates.value);
+  console.log(coordinates.value);
   try {
     const response = await axios.post('http://127.0.0.1:5000/generate-path', coordinates.value, {
       headers: {
@@ -45,16 +70,22 @@ const generatePath = async () => {
 };
 
 const emit = defineEmits(['switchSC']);
+const updateShowPath = () => {
+  pathLayer.setVisible(showPath.value)
+}
 
 const updateShowDraw = () => {
   va1.value=!va1.value;
   emit('switchSC');  // 触发事件更新父组件
 }
+
+
+
 </script>
 
 <style scoped lang="scss">
 
-.path-ccontainer {
+.path-container {
   height: 100%; /* 设置容器高度 */
   background-color: rgb(52, 52, 52);
   display: flex;
@@ -91,4 +122,30 @@ const updateShowDraw = () => {
 .create-path el-button {
   align-self: center; /* 确保按钮居中 */
 }
+
+.coordinates {
+  display: flex;
+  flex-direction: column; /* 垂直排列输入框 */
+  align-items: center; /* 居中对齐 */
+  width: 100%; /* 确保宽度填满父容器 */
+}
+
+.coordinates el-input__wrapper {
+  display: flex;
+  justify-content: center; /* 水平居中 */
+  align-items: center;     /* 垂直居中 */
+  width: 83%!important  ;            /* 控制输入框的宽度 */
+  margin: 8px;
+}
+.coordinates span{
+  display: flex;
+  flex-direction: column; /* 垂直排列输入框 */
+  align-items: left; /* 居中对齐 */
+  width: 83%; /* 确保宽度填满父容器 */
+}
+.el-input {
+  width: 83%; /* 确保输入框宽度占满父容器 */
+  margin: 8px;
+}
+
 </style>

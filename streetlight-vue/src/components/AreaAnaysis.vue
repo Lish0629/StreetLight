@@ -20,16 +20,19 @@
 
 <script setup>
 import axios from "axios";
-import { defineEmits,ref } from 'vue';
+import { ref } from 'vue';
 import {bufferLayer} from "@/data/layers";
 const va0=ref(false);
 
+//距离缓冲区
 const dist = ref({
   build_dist: 10,
   lantern_dist: 10
 });
 
 const generateBuffer = async () => {
+  va0.value=true;
+  updateShowBuffer();
   console.log(dist.value)
   try {
     const response = await axios.post('http://127.0.0.1:5000/generate-lantern-buffer', dist.value, {

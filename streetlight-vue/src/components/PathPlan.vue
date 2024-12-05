@@ -24,6 +24,7 @@ import { defineEmits,ref,computed } from 'vue';
 import { useStore } from "vuex";
 import { pathLayer} from "@/data/layers";
 
+
 //路径图层显示属性
 const showPath = ref(false);
 
@@ -63,6 +64,8 @@ const test1=()=>{
 
 //生产路径端口
 const generatePath = async () => {
+  showPath.value=true;
+  updateShowPath();
   //console.log(points.value);
   coordinates.value = {
     lon1: points.value.point1[0],

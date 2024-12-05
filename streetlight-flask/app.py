@@ -12,6 +12,17 @@ app.config.from_object(Config)
 db.init_app(app)
 CORS(app)
 
+@app.route('/init',methods=['get'])
+def init_serve():
+    try:
+        with db.session.begin():
+            db.session.execute(text('DELETE FROM buffer_result'))
+            db.session.execute(text('DELETE FROM paths'))
+        return jsonify({'details':'初始化成功'}),201
+    except Exception as e:
+        print(f"Error:{e}")
+        return jsonify({'error':'缓冲区生成失败','details':str(e)}),500
+
 #路灯信息
 @app.route('/lantern', methods=['GET'])
 def get_users():
@@ -125,13 +136,10 @@ def generate_path():
                 path_geom.pgeom AS path,
                 path_geom.total_cost AS total_cost
             FROM path_geom;
-
             '''), {'lon1': lon1, 'lat1': lat1, 'lat2': lat2, 'lon2': lon2})
-
             # 获取查询结果
         return jsonify({
             'message': '路径生成成功',
-
         }), 201
 
     except Exception as e:

@@ -61,6 +61,16 @@ const initMap=()=>{
   });
 }
 
+// 初始化服务
+const initServe=async()=>{
+  try{
+    const response = await axios.get('http://localhost:5000/init');
+    console.log(response.data);
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 // 切换菜单显示状态
 const toggleMenu = () => {
   menuVisible.value = !menuVisible.value;
@@ -127,6 +137,7 @@ watch(()=>props.options.showDraw,()=>{
 
 onMounted(()=>{
   initMap();
+  initServe();
 });
 
 </script>

@@ -18,7 +18,23 @@ def get_users():
     lanterns = Lantern.query.all()
     return jsonify([lantern.to_dict() for lantern in lanterns])
 
-
+@app.route('/lantern/<int:lantern_id>', methods=['PUT'])
+def update_lantern(lantern_id):
+    data = request.json  # 从请求中获取 JSON 数据
+    try:
+        # 查找需要更新的路灯
+        lantern = Lantern.query.get(lantern_id)
+        if not lantern:
+            return jsonify({'error': '路灯未找到'}), 404
+        # 更新路灯状态
+        if 'status' in data:
+            lantern.status = data['status']
+        # 保存到数据库
+        db.session.commit()
+        return jsonify({'message': '路灯状态更新成功', 'lantern': lantern.to_dict()}), 200
+    except Exception as e:
+        db.session.rollback()  # 回滚事务
+        return jsonify({'error': '路灯状态更新失败', 'details': str(e)}), 500
 
 
 #生成缓冲区分析图层
@@ -113,9 +129,6 @@ def generate_path():
             '''), {'lon1': lon1, 'lat1': lat1, 'lat2': lat2, 'lon2': lon2})
 
             # 获取查询结果
-
-
-
         return jsonify({
             'message': '路径生成成功',
 

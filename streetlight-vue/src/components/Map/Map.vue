@@ -28,6 +28,7 @@ import { Draw } from 'ol/interaction';
 import { useStore } from "vuex";
 import { Style, Icon } from 'ol/style';
 import flagImage from '@/assets/flag.png';
+import { useMapCooStore } from "@/store/store";
 
 let map;
 let drawInteraction;
@@ -49,6 +50,8 @@ const props = defineProps({
   options:{
   }
 })
+
+const storepinia=useMapCooStore()
 
 const popup = new Overlay({
   element: document.getElementById('popup'),
@@ -125,7 +128,6 @@ const flagIconStyle = new Style({
 
 //绘制模式
 const toggleDraw = () => {
-
   if (drawMode.value) {
     // 停止绘制模式
     map.removeInteraction(drawInteraction);
@@ -154,10 +156,12 @@ const toggleDraw = () => {
       if (!points.value.point1) {
         points.value.point1 = coordinates;  // 存储第一个点
         store.dispatch('updatePoint',{pointIndex:'point1',coordinates});
+        storepinia.setPoint('point1',coordinates);
         console.log('第一个点存储:', points.value.point1);
       } else if (!points.value.point2) {
         points.value.point2 = coordinates;  // 存储第二个点
         store.dispatch('updatePoint',{pointIndex:'point2',coordinates});
+        storepinia.setPoint('point2',coordinates);
         console.log('第二个点存储:', points.value.point2);
         drawMode.value = false; // 结束绘制模式
         console.log('两个点都已绘制:', points.value);

@@ -7,7 +7,7 @@
         <span>起点:</span>
         <el-input v-model="point1text" placeholder="起点坐标" readonly></el-input>
         <span>终点:</span>
-        <el-input v-model="point2text" placeholder="终点坐标" readonly></el-input>
+        <el-input v-model="point2text1" placeholder="终点坐标" readonly></el-input>
       </div>
     </div>
     <el-button @click="generatePath">🗺️生成最短路径</el-button> <!-- 将按钮单独放到下一行 -->
@@ -23,7 +23,7 @@ import axios from "axios";
 import { defineEmits,ref,computed } from 'vue';
 import { useStore } from "vuex";
 import { pathLayer} from "@/data/layers";
-
+import { useMapCooStore } from "@/store/store";
 
 //路径图层显示属性
 const showPath = ref(false);
@@ -33,10 +33,10 @@ const coordinates=ref({});
 
 //Vuex存储
 const store=useStore();
-
+const store1=useMapCooStore();
 //获取Vuex存储的point值
 const points=computed(()=>store.state.pathpoints.points);
-
+const points1=computed(()=> store1.points);
 //起点文本格式化
 const point1text = computed(() => {
   if (points.value.point1[0]) {
@@ -57,6 +57,15 @@ const point2text = computed(() => {
   return "终点坐标";
 });
 
+const point2text1 = computed(() => {
+  if (points.value.point2[0]) {
+    const lon = points1.value.point2[0]?.toFixed(3) || "0.000";
+    const lat = points1.value.point2[1]?.toFixed(3) || "0.000";
+    return `${lon}, ${lat}`;
+  }
+  return "终点坐标";
+});
+
 //测试函数
 const test1=()=>{
   console.log(points.point1);
@@ -70,8 +79,8 @@ const generatePath = async () => {
   coordinates.value = {
     lon1: points.value.point1[0],
     lat1: points.value.point1[1],
-    lon2: points.value.point2[0],
-    lat2: points.value.point2[1]
+    lon2: points1.value.point2[0],
+    lat2: points1.value.point2[1]
   };
   console.log(coordinates.value);
   try {

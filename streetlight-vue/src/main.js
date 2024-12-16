@@ -1,5 +1,6 @@
 import "ol/ol.css";
 import { createApp } from 'vue'
+import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from './router'
 import ElementPlus from 'element-plus'
@@ -8,6 +9,8 @@ import 'element-plus/theme-chalk/dark/css-vars.css'
 import store from './store/index.js'
 const app = createApp(App)
 
-app.use(router).use(ElementPlus).use(store)
+const pinia = createPinia()
+
+app.use(router).use(ElementPlus).use(store).use(pinia)
 
 app.mount('#app')

@@ -6,6 +6,9 @@
       </button>
       <div class="lantern-menu-container" v-if="menuVisible">
         <LanternMenu />
+        <div id="popup" class="ol-popup">
+          <div id="popup-content"></div>
+        </div>
       </div>
       <!--<button @click="toggleDraw" class="draw-btn">{{ drawMode ? '停止绘制' : '开始绘制' }}</button>-->
     </div>
@@ -16,6 +19,7 @@
 import "ol/ol.css";
 import Map from 'ol/Map.js';
 import View from 'ol/View.js'
+import Overlay from 'ol/Overlay';
 import LanternMenu from "./LanternMenu.vue";
 import { fromLonLat } from 'ol/proj';
 import { onMounted,ref,watch } from 'vue';
@@ -45,6 +49,41 @@ const props = defineProps({
   options:{
   }
 })
+
+const popup = new Overlay({
+  element: document.getElementById('popup'),
+  autoPan: true,
+  autoPanAnimation: {
+    duration: 250,
+  },
+});
+
+const initPopup=()=>{
+  popup.setElement(document.getElementById('popup'));
+  map.addOverlay(popup);
+  // 为地图绑定单击事件
+  map.on('singleclick', (evt) => {
+    // 获取点击处的像素和要素
+    const feature = map.forEachFeatureAtPixel(evt.pixel, (feature, layer) => {
+      return layer === lanternLayer ? feature : null;
+    });
+
+    if (feature) {
+      const coordinates = feature.getGeometry().getCoordinates();
+      const content = `
+        <p><strong>序号：</strong> ${feature.get('name') || '未定义'}</p>
+        <p><strong>状态：</strong> ${feature.get('status')?'正常':'故障'}</p>
+      `;
+      
+      // 设置 Popup 内容和位置
+      document.getElementById('popup-content').innerHTML = content;
+      popup.setPosition(coordinates);
+    } else {
+      // 如果没有点击到要素，则隐藏 Popup
+      popup.setPosition(undefined);
+    }
+  });
+};
 
 //初始化地图
 const initMap=()=>{
@@ -138,7 +177,10 @@ watch(()=>props.options.showDraw,()=>{
 onMounted(()=>{
   initMap();
   initServe();
+  initPopup();
 });
+
+
 
 </script>
 
@@ -196,6 +238,18 @@ onMounted(()=>{
 /* 鼠标悬浮时按钮样式 */
 .toggle-menu-btn:hover {
   background-color: rgba(0, 0, 0, 0.9);
+}
+.ol-popup {
+  position: absolute;
+  background-color: rgb(40, 39, 39);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  padding: 15px;
+  border-radius: 10px;
+  border: 1px solid #383838;
+  bottom: 25px;
+  left: -89.5px;
+  width: 150px;
+  
 }
 
 </style>

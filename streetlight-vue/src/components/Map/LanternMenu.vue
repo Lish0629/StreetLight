@@ -44,9 +44,9 @@ const fetchData = async () => {
   try{
     const response = await axios.get('http://localhost:5000/lantern');
     tableData.value = response.data;
-    console.log(tableData.value);
+    //console.log(tableData.value);
   } catch (error) {
-    console.log(error);
+    //console.log(error);
   }
 };
 

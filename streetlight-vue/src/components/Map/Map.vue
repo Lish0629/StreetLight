@@ -25,16 +25,15 @@ import { fromLonLat } from 'ol/proj';
 import { onMounted,ref,watch } from 'vue';
 import { markLayer, tileLayer,lanternLayer,bufferLayer,pathLayer,pointLayer,vectorPoint} from "@/data/layers";
 import { Draw } from 'ol/interaction';
-import { useStore } from "vuex";
+import { WKT } from 'ol/format';
 import { Style, Icon } from 'ol/style';
 import flagImage from '@/assets/flag.png';
-import { useMapCooStore } from "@/store/store";
+import { useMapCooStore,useSelectStore } from "@/store/store";
+import axios from "axios";
 
 let map;
 let drawInteraction;
 
-//引入Vuex状态管理
-const store=useStore();
 
 //存储绘制的起始点
 const points = ref({ point1: null, point2: null });
@@ -51,7 +50,9 @@ const props = defineProps({
   }
 })
 
-const storepinia=useMapCooStore()
+//引入Pinia状态管理
+const storeMapCoo=useMapCooStore();
+const storeSelect=useSelectStore();
 
 const popup = new Overlay({
   element: document.getElementById('popup'),
@@ -81,6 +82,7 @@ const initPopup=()=>{
       // 设置 Popup 内容和位置
       document.getElementById('popup-content').innerHTML = content;
       popup.setPosition(coordinates);
+      storeSelect.handleSelect(feature.get('name'));
     } else {
       // 如果没有点击到要素，则隐藏 Popup
       popup.setPosition(undefined);
@@ -155,13 +157,11 @@ const toggleDraw = () => {
       // 判断是第一个点还是第二个点
       if (!points.value.point1) {
         points.value.point1 = coordinates;  // 存储第一个点
-        store.dispatch('updatePoint',{pointIndex:'point1',coordinates});
-        storepinia.setPoint('point1',coordinates);
+        storeMapCoo.setPoint('point1',coordinates);
         console.log('第一个点存储:', points.value.point1);
       } else if (!points.value.point2) {
         points.value.point2 = coordinates;  // 存储第二个点
-        store.dispatch('updatePoint',{pointIndex:'point2',coordinates});
-        storepinia.setPoint('point2',coordinates);
+        storeMapCoo.setPoint('point2',coordinates);
         console.log('第二个点存储:', points.value.point2);
         drawMode.value = false; // 结束绘制模式
         console.log('两个点都已绘制:', points.value);
@@ -176,6 +176,19 @@ const toggleDraw = () => {
 //监听绘制模型
 watch(()=>props.options.showDraw,()=>{
   toggleDraw();
+})
+
+watch(()=>storeSelect.selectPoint,(newValue, oldValue)=>{
+  //map.getView.setCenter(storeSelect.selectPoint.geom);
+  console.log(storeSelect.selectPoint.geom);
+  const wktFormat = new WKT();
+
+
+  // 解析WKT字符串为OpenLayers几何对象
+  const point = wktFormat.readGeometry(storeSelect.selectPoint.geom);
+  map.getView().setCenter(fromLonLat(point.getCoordinates()));
+  map.getView().setZoom(20);
+  console.log(point)
 })
 
 onMounted(()=>{

@@ -1,18 +1,10 @@
 <template>
   <div class="lantern-menu">
-    <el-table :data="tableData" style="width: 100%" height="100%" :header-cell-style="{ position: 'sticky', top: 0, zIndex: 1 }">
+    <el-table :data="tableData" style="width: 100%" height="100%" :header-cell-style="{ position: 'sticky', top: 0, zIndex: 1 }" @row-click="onRowClick">
       <el-table-column prop="id" label="序号" width="120"></el-table-column>
-        <el-table-column label="路灯状态" width="180"
-        :filters="statusFilters"
-        :filter-method="filterStatus"
-        column-key="status"
-        >
+      <el-table-column label="路灯状态" width="180" :filters="statusFilters" :filter-method="filterStatus" column-key="status">
         <template #default="{ row }">
-          <el-select
-            v-model="row.status"
-            placeholder="请选择状态"
-            @change="updateStatus(row)"
-          >
+          <el-select v-model="row.status" placeholder="请选择状态" @change="updateStatus(row)">
             <el-option label="正常" :value="true" />
             <el-option label="异常" :value="false" />
           </el-select>
@@ -23,16 +15,16 @@
 </template>
 
 <script setup>
-import { ref,onMounted } from 'vue';
+import { ref,onMounted} from 'vue';
 import { ElTable, ElTableColumn } from 'element-plus';
 import axios from 'axios';
-
+import { useSelectStore } from '@/store/store';
 //筛选菜单，提供选项
 const statusFilters = [
   { text: "正常", value: true },
   { text: "异常", value: false },
 ];
-
+const store = useSelectStore();
 //筛选选择器，实现逻辑
 const filterStatus = (value, row) => row.status === value;
 
@@ -60,6 +52,12 @@ const updateStatus = async (row) => {
   } catch (error) {
     console.error("状态更新失败:", error);
   }
+};
+
+const onRowClick = (row) => {
+  store.handleSelect(row.id); // 自定义的 setID 函数
+  store.selectPoint=row;
+  console.log(store.selectPoint);
 };
 
 onMounted(() => {

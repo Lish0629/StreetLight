@@ -146,6 +146,54 @@ def generate_path():
         print(f"Error: {e}")
         return jsonify({'error': '路径生成失败', 'details': str(e)}), 500
 
+@app.route('/del-lantern/<int:lantern_id>', methods=['DELETE'])
+def delete_lantern(lantern_id):
+    try:
+        # 根据 id 查找路灯
+        lantern = Lantern.session.get(lantern_id)
+        if not lantern:
+            return jsonify({'error': '路灯未找到'}), 404
+
+        # 删除该记录
+        db.session.delete(lantern)
+        db.session.commit()
+        return jsonify({'message': '路灯删除成功', 'lantern_id': lantern_id}), 200
+    except Exception as e:
+        db.session.rollback()  # 出现错误时回滚
+        print(f"Error: {e}")
+        return jsonify({'error': '删除路灯失败', 'details': str(e)}), 500
+
+@app.route('/add-lantern', methods=['POST'])
+def add_lantern():
+    data = request.json  # 从请求中获取 JSON 数据
+    try:
+        # 获取请求数据中的各个字段
+        id = data.get('id')
+        name = data.get('name')
+        status = data.get('status')
+        geom = data.get('geom')  # 假设传递的是 GeoJSON 或 WKT 格式的数据
+
+        # 检查必要的字段
+        if not name or not status or not geom:
+            return jsonify({'error': '缺少必要的字段'}), 400
+
+        # 将 geom 数据转换为 GeoAlchemy2 中的 Geometry 类型
+        from geoalchemy2 import WKTElement
+        geom_wkt = WKTElement(geom, srid=4326)  # 假设传递的是 WKT 格式的坐标
+
+        # 创建一个新的 Lantern 实例
+        new_lantern = Lantern(id=id,name=name, status=status, geom=geom_wkt)
+
+        # 将新路灯添加到数据库
+        db.session.add(new_lantern)
+        db.session.commit()
+
+        return jsonify({'message': '路灯添加成功', 'lantern': new_lantern.to_dict()}), 201
+    except Exception as e:
+        db.session.rollback()  # 出现错误时回滚
+        print(f"Error: {e}")
+        return jsonify({'error': '添加路灯失败', 'details': str(e)}), 500
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()  # 创建数据库表

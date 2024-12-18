@@ -20,7 +20,6 @@ class Lantern(db.Model):
 
     def geom_desc(self):
         # 将 `geom` 转换为 WKT 格式，方便前端使用
-        from geoalchemy2.elements import WKTElement
         if self.geom:
             return db.session.scalar(self.geom.ST_AsText())  # 使用 PostGIS 函数返回 WKT
         return None

@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { reactive,ref } from "vue";
+import { reactive } from "vue";
 export const useMapCooStore = defineStore('MapCoo',()=>{
   const points = {
     point1:{},
@@ -15,10 +15,14 @@ export const useMapCooStore = defineStore('MapCoo',()=>{
 
 export const useSelectStore = defineStore('SelectPoint',()=>{
   const selectPoint = reactive({});
-  const selectPointid = ref(0);
-  function handleSelect (index){
-    selectPointid.value=index;
+  return {selectPoint}
+})
+
+export const createPointStore = defineStore('CreatePoint',()=>{
+  const drawPointStatus = ref(false);
+  function handleCreateDraw(){
+    drawPointStatus.value=!drawPointStatus.value
   };
 
-  return {selectPoint,selectPointid,handleSelect}
+  return {drawPointStatus,handleCreateDraw}
 })

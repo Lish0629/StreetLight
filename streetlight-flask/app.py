@@ -149,14 +149,13 @@ def generate_path():
 @app.route('/del-lantern/<int:lantern_id>', methods=['DELETE'])
 def delete_lantern(lantern_id):
     try:
-        # 根据 id 查找路灯
-        lantern = Lantern.session.get(lantern_id)
-        if not lantern:
-            return jsonify({'error': '路灯未找到'}), 404
+        # 根据 id 查找路灯，如果不存在直接返回 404
+        lantern = Lantern.query.get_or_404(lantern_id)
 
-        # 删除该记录
+        # 删除路灯记录
         db.session.delete(lantern)
         db.session.commit()
+
         return jsonify({'message': '路灯删除成功', 'lantern_id': lantern_id}), 200
     except Exception as e:
         db.session.rollback()  # 出现错误时回滚
@@ -169,10 +168,9 @@ def add_lantern():
     try:
         # 获取请求数据中的各个字段
         id = data.get('id')
-        name = data.get('name')
+        name = data.get('id')
         status = data.get('status')
         geom = data.get('geom')  # 假设传递的是 GeoJSON 或 WKT 格式的数据
-
         # 检查必要的字段
         if not name or not status or not geom:
             return jsonify({'error': '缺少必要的字段'}), 400

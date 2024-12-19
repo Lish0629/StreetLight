@@ -1,17 +1,45 @@
 <template>
   <div>
+    <el-dialog></el-dialog>
     <div id="map">
       <button class="toggle-menu-btn" @click="toggleMenu" :class="{ 'menu-hidden': !menuVisible }">
-        {{ menuVisible ? '<<' : '>>' }}
+        {{ menuVisible ? '>>' : '<<' }}
       </button>
       <div class="lantern-menu-container" v-if="menuVisible">
         <LanternMenu />
-        <div id="popup" class="ol-popup">
-          <div id="popup-content"></div>
-        </div>
       </div>
-      <!--<button @click="toggleDraw" class="draw-btn">{{ drawMode ? '停止绘制' : '开始绘制' }}</button>-->
+      <div id="popup" class="ol-popup">
+        <div id="popup-content"></div>
+      </div>
     </div>
+    <el-dialog v-model="dialogVisible" title="Tips" width="300">
+      <div style="margin-bottom: 8px;">
+        <span id="status-label">状态：</span>
+        <el-select v-model="lanternStatus" placeholder="请选择状态">
+          <el-option label="正常" value="true"></el-option>
+          <el-option label="故障" value="false"></el-option>
+        </el-select>
+      </div>
+      <!-- 路灯 ID 输入框 -->
+      <span id="status-label">序号：</span>
+      <el-input v-model="newLanternId" placeholder="请输入路灯序号"></el-input>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="dialogVisible = false">取消</el-button>
+          <el-button type="primary" @click="addLantern">确定</el-button>
+        </div>
+      </template>
+    </el-dialog>
+    <el-dialog v-model="dialogDelVisible" title="Tips" width="300">
+      <span id="status-label">序号：</span>
+      <el-input v-model="dellanternid" placeholder="请输入删除路灯序号"></el-input>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="dialogDelVisible = false">取消</el-button>
+          <el-button type="danger" @click="delLantern">删除</el-button>
+        </div>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -28,31 +56,37 @@ import { Draw } from 'ol/interaction';
 import { WKT } from 'ol/format';
 import { Style, Icon } from 'ol/style';
 import flagImage from '@/assets/flag.png';
-import { useMapCooStore,useSelectStore } from "@/store/store";
+import { useMapCooStore,useSelectStore,createPointStore } from "@/store/store";
 import axios from "axios";
+import { ElMessage } from "element-plus";
+import Point from 'ol/geom/Point';
 
 let map;
 let drawInteraction;
-
-
+const newLanternId=ref();
+const lanternStatus=ref(true);
+const dellanternid=ref();
 //存储绘制的起始点
 const points = ref({ point1: null, point2: null });
 
 //菜单显示状态
-const menuVisible = ref(true);
+const menuVisible = ref(false);
 
 //绘制模式
 const drawMode = ref(false);
 
 //定义Props
 const props = defineProps({
-  options:{
-  }
+  options:{}
 })
 
+const dialogVisible=ref(false)
+const dialogDelVisible=ref(false)
 //引入Pinia状态管理
 const storeMapCoo=useMapCooStore();
 const storeSelect=useSelectStore();
+const storeCreate=createPointStore();
+
 
 const popup = new Overlay({
   element: document.getElementById('popup'),
@@ -82,7 +116,6 @@ const initPopup=()=>{
       // 设置 Popup 内容和位置
       document.getElementById('popup-content').innerHTML = content;
       popup.setPosition(coordinates);
-      storeSelect.handleSelect(feature.get('name'));
     } else {
       // 如果没有点击到要素，则隐藏 Popup
       popup.setPosition(undefined);
@@ -178,26 +211,120 @@ watch(()=>props.options.showDraw,()=>{
   toggleDraw();
 })
 
-watch(()=>storeSelect.selectPoint,(newValue, oldValue)=>{
-  //map.getView.setCenter(storeSelect.selectPoint.geom);
+watch(()=>storeSelect.selectPoint,(newPoint)=>{
   console.log(storeSelect.selectPoint.geom);
+  //创建WKT格式的对象
   const wktFormat = new WKT();
-
-
-  // 解析WKT字符串为OpenLayers几何对象
+  //创建要素点
   const point = wktFormat.readGeometry(storeSelect.selectPoint.geom);
+  //设置中心点和缩放级别
   map.getView().setCenter(fromLonLat(point.getCoordinates()));
   map.getView().setZoom(20);
   console.log(point)
+  if (newPoint && newPoint.id) {
+    // 遍历 lanternLayer 的所有要素，找到匹配的 id
+    console.log(newPoint.id)
+    const feature = lanternLayer.getSource().getFeatures().find((f) => f.get('name') === newPoint.name);
+
+    console.log(feature)
+    if (feature) {
+      // 获取要素的坐标
+      const coordinates = feature.getGeometry().getCoordinates();
+      // 设置 Popup 内容
+      const content = `
+        <p><strong>序号：</strong> ${feature.get('name') || '未定义'}</p>
+        <p><strong>状态：</strong> ${feature.get('status') ? '正常' : '故障'}</p>
+      `;
+      document.getElementById('popup-content').innerHTML = content;
+      // 设置 Popup 的位置
+      popup.setPosition(coordinates);
+      // 平移视图到目标位置
+    } else {
+      console.log('未找到匹配的要素');
+      popup.setPosition(undefined); // 如果没有匹配要素，则隐藏 Popup
+    }
+  }
 })
+
+watch(()=>storeCreate.drawPointStatus,()=>{
+  console.log("!");
+  map.on("click", handleMapClick); // 监听地图点击事件
+})
+let clickCoordinate;
+// 处理地图点击事件
+const handleMapClick = (event) => {
+  clickCoordinate = event.coordinate; // 获取点击位置的坐标（EPSG:3857）
+  console.log(clickCoordinate)
+  dialogVisible.value = true; // 显示弹窗输入路灯 ID
+  console.log(dialogVisible.value)
+};
+// 添加路灯
+const addLantern = async () => {
+  if (!newLanternId.value) {
+    ElMessage.error("路灯ID不能为空");
+    return;
+  }
+  const coordinateWithZ = [...clickCoordinate, 0]; // 添加Z=0
+  const wktFormat = new WKT();
+  const geom = wktFormat.writeGeometry(
+    new Point(coordinateWithZ), // 使用点击坐标生成几何
+    {
+      dataProjection: 'EPSG:4326', // 数据投影
+      featureProjection: 'EPSG:3857', // 地图投影
+    }
+  );
+  
+  const lanternData = {
+    id: newLanternId.value,
+    status:lanternStatus.value,
+    geom, // WKT 格式的几何
+  };
+  console.log(lanternData)
+  try {
+    const response = await axios.post("http://localhost:5000/add-lantern", lanternData); // 调用后端 API
+    if (response.status === 201) {
+      ElMessage.success("路灯添加成功");
+      dialogVisible.value = false;
+      lanternLayer.getSource().refresh(); // 重新加载图层源
+      // 在地图上显示新增路灯点
+    }
+  } catch (error) {
+    ElMessage.error("路灯添加失败");
+    console.error(error);
+  }
+};
+
+watch(()=>storeCreate.delPointStatus,()=>{
+
+  dialogDelVisible.value=true;
+})
+
+// 添加路灯
+const delLantern = async () => {
+  
+  try {
+    const response = await axios.delete(`http://localhost:5000/del-lantern/${dellanternid.value}`); // 调用后端 API
+    if (response.status === 200) {
+      ElMessage.success("路灯删除成功");
+      dialogDelVisible.value = false;
+      // 假设你有一个图层对象 'layer'
+      lanternLayer.getSource().refresh(); // 重新加载图层源
+
+      // 这里可以加入逻辑来更新地图上的数据
+    } else {
+      ElMessage.error("路灯删除失败，未找到该路灯");
+    }
+  } catch (error) {
+    ElMessage.error("路灯删除失败，请检查网络或联系管理员");
+    console.error(error);
+  }
+};
 
 onMounted(()=>{
   initMap();
   initServe();
   initPopup();
 });
-
-
 
 </script>
 
@@ -262,11 +389,30 @@ onMounted(()=>{
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
   padding: 15px;
   border-radius: 10px;
-  border: 1px solid #383838;
+  border: none; /* 去除边框 */
   bottom: 25px;
   left: -89.5px;
   width: 150px;
+  z-index: 9999;
+}
+
+/* 增加箭头的样式 */
+.ol-popup::after {
+  content: ''; /* 创建一个空内容的伪元素 */
+  position: absolute;
+  bottom: -13px; /* 设置箭头的位置 */
+  left: 50%;
+  transform: translateX(-50%); /* 水平居中 */
+  width: 0;
+  height: 0;
   
+  /* 创建箭头的透明边框 */
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 20px solid rgb(40, 39, 39); /* 箭头颜色与背景一致 */
+}
+.el-dialog {
+  z-index: 2000 !important; /* 确保高于地图或其他元素 */
 }
 
 </style>

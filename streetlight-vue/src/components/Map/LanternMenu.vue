@@ -55,7 +55,6 @@ const updateStatus = async (row) => {
 };
 
 const onRowClick = (row) => {
-  store.handleSelect(row.id); // 自定义的 setID 函数
   store.selectPoint=row;
   console.log(store.selectPoint);
 };

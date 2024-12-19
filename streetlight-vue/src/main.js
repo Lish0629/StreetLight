@@ -9,6 +9,7 @@ import 'element-plus/theme-chalk/dark/css-vars.css'
 
 const app = createApp(App)
 
+//引入Pinia状态管理
 const pinia = createPinia()
 
 app.use(router).use(ElementPlus).use(pinia)

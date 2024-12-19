@@ -15,11 +15,10 @@
 <script setup>
 import { ref } from 'vue';
 import { lanternLayer,getStyleFunction } from '@/data/layers';
-import { createPointStore } from "@/store/store";
+import { createPointStore} from "@/store/store";
 import { ElMessage } from 'element-plus';
 const va=ref(false);
 const storeCreate=createPointStore();
-
 const updateShowAll = () => {
   lanternLayer.setStyle(getStyleFunction(!va.value)); // 更新样式
 }
@@ -32,10 +31,7 @@ const addLight = () => {
 
 const removeLight = () => {
   storeCreate.handleDel();
-  
 };
-
-
 
 </script>
 

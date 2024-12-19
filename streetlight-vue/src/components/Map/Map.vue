@@ -2,16 +2,19 @@
   <div>
     <el-dialog></el-dialog>
     <div id="map">
+      <!--切换表格显示-->
       <button class="toggle-menu-btn" @click="toggleMenu" :class="{ 'menu-hidden': !menuVisible }">
         {{ menuVisible ? '>>' : '<<' }}
       </button>
       <div class="lantern-menu-container" v-if="menuVisible">
         <LanternMenu />
       </div>
+      <!--点击提示框-->
       <div id="popup" class="ol-popup">
         <div id="popup-content"></div>
       </div>
     </div>
+    <!--添加路灯提示框-->
     <el-dialog v-model="dialogVisible" title="Tips" width="300">
       <div style="margin-bottom: 8px;">
         <span id="status-label">状态：</span>
@@ -30,6 +33,7 @@
         </div>
       </template>
     </el-dialog>
+    <!--删除路灯提示框-->
     <el-dialog v-model="dialogDelVisible" title="Tips" width="300">
       <span id="status-label">序号：</span>
       <el-input v-model="dellanternid" placeholder="请输入删除路灯序号"></el-input>
@@ -80,6 +84,7 @@ const props = defineProps({
   options:{}
 })
 
+//提示框显示状态
 const dialogVisible=ref(false)
 const dialogDelVisible=ref(false)
 //引入Pinia状态管理
@@ -91,10 +96,8 @@ const storeCreate=createPointStore();
 const popup = new Overlay({
   element: document.getElementById('popup'),
   autoPan: true,
-  autoPanAnimation: {
-    duration: 250,
-  },
 });
+
 
 const initPopup=()=>{
   popup.setElement(document.getElementById('popup'));
@@ -152,6 +155,7 @@ const initServe=async()=>{
 const toggleMenu = () => {
   menuVisible.value = !menuVisible.value;
 };
+
 
 // 小旗样式
 const flagIconStyle = new Style({
@@ -212,6 +216,10 @@ watch(()=>props.options.showDraw,()=>{
 })
 
 watch(()=>storeSelect.selectPoint,(newPoint)=>{
+  handleSelPoint(newPoint);
+})
+
+const handleSelPoint =(newPoint)=>{
   console.log(storeSelect.selectPoint.geom);
   //创建WKT格式的对象
   const wktFormat = new WKT();
@@ -225,7 +233,6 @@ watch(()=>storeSelect.selectPoint,(newPoint)=>{
     // 遍历 lanternLayer 的所有要素，找到匹配的 id
     console.log(newPoint.id)
     const feature = lanternLayer.getSource().getFeatures().find((f) => f.get('name') === newPoint.name);
-
     console.log(feature)
     if (feature) {
       // 获取要素的坐标
@@ -244,7 +251,7 @@ watch(()=>storeSelect.selectPoint,(newPoint)=>{
       popup.setPosition(undefined); // 如果没有匹配要素，则隐藏 Popup
     }
   }
-})
+}
 
 watch(()=>storeCreate.drawPointStatus,()=>{
   console.log("!");

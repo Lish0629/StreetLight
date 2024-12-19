@@ -9,14 +9,14 @@ ALTER TABLE roadnet ADD COLUMN reverse_cost double precision;	--设置终点字�
 UPDATE roadnet SET cost = ST_Length(geom);
 UPDATE roadnet SET reverse_cost = ST_Length(geom);
 
-
-
 select pgr_createTopology('roadnet', 0.0001,'geom','id');
 
 select st_srid(the_geom)
 from roadnet_vertices_pgr
+
 select pgr_dijkstra('SELECT * FROM roadnet', 1, 41,FALSE)
 SELECT edge
+
 FROM pgr_dijkstra(
     'SELECT id, source, target, cost, reverse_cost FROM roadnet',
     1,  -- 起点 ID

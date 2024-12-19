@@ -202,6 +202,7 @@ const toggleDraw = () => {
         console.log('第二个点存储:', points.value.point2);
         drawMode.value = false; // 结束绘制模式
         console.log('两个点都已绘制:', points.value);
+        console.log('两个点都已绘制:', storeMapCoo.points);
         map.removeInteraction(drawInteraction); // 停止绘制
       }
     });

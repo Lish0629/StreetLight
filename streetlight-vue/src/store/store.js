@@ -1,10 +1,10 @@
 import { defineStore } from "pinia";
 import { reactive,ref } from "vue";
 export const useMapCooStore = defineStore('MapCoo',()=>{
-  const points = {
-    point1:{},
-    point2:{}
-  };
+  const points = reactive({
+    point1: {},
+    point2: {}
+  });
 
   function setPoint(pointIndex,coordinates){
     points[pointIndex]=coordinates;

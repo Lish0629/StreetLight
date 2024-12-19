@@ -41,6 +41,7 @@ const generateBuffer = async () => {
       },
     });
     console.log(response.data); 
+    bufferLayer.getSource().refresh(); // 清空图层
   } catch (error) {
     console.error('Error:', error);  // 捕获错误
   }

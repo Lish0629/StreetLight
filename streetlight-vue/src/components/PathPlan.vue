@@ -55,9 +55,14 @@ const point2text = computed(() => {
   return "终点坐标";
 });
 
+const test = () => {
+  console.log(point1.value);
+  console.log(point2.value);
+};
 
 //生产路径端口
 const generatePath = async () => {
+  console.log(point1.value);
   showPath.value=true;
   updateShowPath();
   //console.log(points.value);
@@ -75,6 +80,7 @@ const generatePath = async () => {
       },
     });
     console.log(response.data); 
+    pathLayer.getSource().refresh();  // 清空图层
   } catch (error) {
     console.error('Error:', error);  // 捕获错误
   }

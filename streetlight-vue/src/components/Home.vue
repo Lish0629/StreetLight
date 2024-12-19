@@ -47,7 +47,7 @@
 
 <script setup>
 
-import Map from './map/Map.vue';
+import Map from './Map/Map.vue';
 import { ref } from 'vue';
 import EquipManager from './EquipManager.vue';
 import AreaAnaysis from './AreaAnaysis.vue';

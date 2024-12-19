@@ -52,7 +52,7 @@ import "ol/ol.css";
 import Map from 'ol/Map.js';
 import View from 'ol/View.js'
 import Overlay from 'ol/Overlay';
-import LanternMenu from "./LanternMenu.vue";
+import LanternMenu from "./map/LanternMenu.vue";
 import { fromLonLat } from 'ol/proj';
 import { onMounted,ref,watch } from 'vue';
 import { markLayer, tileLayer,lanternLayer,bufferLayer,pathLayer,pointLayer,vectorPoint} from "@/data/layers";
